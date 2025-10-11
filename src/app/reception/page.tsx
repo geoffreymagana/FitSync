@@ -262,7 +262,7 @@ export default function ReceptionDashboardPage() {
                         <AlertTitle>Membership Status</AlertTitle>
                         <AlertDescription className="flex items-center gap-2">
                            <Badge 
-                                variant={selectedMember.status === 'Active' ? 'default' : member.status === 'Inactive' ? 'secondary' : 'outline'}
+                                variant={selectedMember.status === 'Active' ? 'default' : selectedMember.status === 'Inactive' ? 'secondary' : 'outline'}
                                 className={selectedMember.status === 'Active' ? 'bg-green-500 hover:bg-green-600' : ''}
                             >
                                 {selectedMember.status}
@@ -282,6 +282,4 @@ export default function ReceptionDashboardPage() {
       </Dialog>
     </div>
   );
-
-    
-
+}
