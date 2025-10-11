@@ -1,4 +1,6 @@
 
+"use client";
+
 import { ReceptionContextProvider } from '@/context/reception-context';
 import { AppSidebar } from '@/components/app-sidebar';
 import { Notifications } from '@/components/notifications';
@@ -10,6 +12,34 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import { useContext, useEffect } from 'react';
+import { LocationSwitcher } from '@/components/location-switcher';
+import { ReceptionContext } from '@/context/reception-context';
+
+function ReceptionHeader() {
+  const { selectedLocation, setSelectedLocation } = useContext(ReceptionContext);
+
+  if (!selectedLocation) {
+    return null;
+  }
+  
+  return (
+    <div className='flex items-center gap-4'>
+        <LocationSwitcher selectedLocation={selectedLocation.id} onLocationChange={setSelectedLocation} />
+        <Popover>
+            <PopoverTrigger asChild>
+            <Button variant="outline" size="icon">
+                <Bell className="h-4 w-4" />
+                <span className="sr-only">Open notifications</span>
+            </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80" align="end">
+            <Notifications role="reception" />
+            </PopoverContent>
+        </Popover>
+    </div>
+  )
+}
 
 export default function ReceptionLayout({
   children,
@@ -39,17 +69,7 @@ export default function ReceptionLayout({
                 <AppSidebar role="reception" />
               </SheetContent>
             </Sheet>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Bell className="h-4 w-4" />
-                  <span className="sr-only">Open notifications</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80" align="end">
-                <Notifications role="reception" />
-              </PopoverContent>
-            </Popover>
+            <ReceptionHeader />
           </header>
           <main className="flex-1 overflow-y-auto">
             <div className="p-4 md:p-8">{children}</div>
@@ -59,3 +79,5 @@ export default function ReceptionLayout({
     </ReceptionContextProvider>
   );
 }
+
+    

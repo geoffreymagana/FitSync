@@ -26,7 +26,6 @@ const QrScanner = dynamic(() => import('@/components/qr-scanner').then(mod => mo
 
 
 export default function ReceptionDashboardPage() {
-  const { selectedLocation } = useContext(ReceptionContext);
   const { toast } = useToast();
   
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,6 +35,7 @@ export default function ReceptionDashboardPage() {
   const [isCheckInDialogOpen, setIsCheckInDialogOpen] = useState(false);
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
   const [recentActivities, setRecentActivities] = useState<Activity[]>(initialRecentActivities);
+  const { selectedLocation } = useContext(ReceptionContext);
 
   useEffect(() => {
     if (!selectedLocation) return;
@@ -113,7 +113,8 @@ export default function ReceptionDashboardPage() {
   const handleQrScan = (result: string | null) => {
     if (result) {
       setIsQrDialogOpen(false);
-      const member = members.find(m => m.id === result && m.locationId === selectedLocation?.id);
+      if (!selectedLocation) return;
+      const member = members.find(m => m.id === result && m.locationId === selectedLocation.id);
       if (member) {
         openCheckInDialog(member);
       } else {
@@ -242,7 +243,7 @@ export default function ReceptionDashboardPage() {
                   {upcomingClasses.map(cls => (
                     <TableRow key={cls.id}>
                       <TableCell className="font-medium">
-                        <Link href={`/admin/schedule/${cls.id}`} className="hover:underline">
+                        <Link href={`/reception/schedule/${cls.id}`} className="hover:underline">
                             <div>{cls.name}</div>
                         </Link>
                         <div className="text-xs text-muted-foreground">{cls.trainer}</div>

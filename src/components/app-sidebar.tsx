@@ -18,6 +18,7 @@ import {
   Receipt,
   ShoppingBag,
   Warehouse,
+  UserRound,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -56,7 +57,7 @@ const instructorNavItems: NavItem[] = [
 
 const receptionNavItems: NavItem[] = [
   { href: "/reception", icon: UserCheck, label: "Check-In" },
-  { href: "/reception/walk-in", icon: Users, label: "Walk-in" },
+  { href: "/reception/walk-in", icon: UserRound, label: "Walk-in" },
   { href: "/reception/transactions", icon: Receipt, label: "Transactions" },
 ];
 
@@ -154,3 +155,5 @@ export function AppSidebar({ role }: AppSidebarProps) {
     </aside>
   );
 }
+
+    
