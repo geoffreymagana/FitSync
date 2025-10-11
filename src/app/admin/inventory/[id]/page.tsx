@@ -5,14 +5,17 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { inventory as initialInventory, InventoryItem } from "@/lib/data";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Edit, Trash, Save } from "lucide-react";
 import Image from 'next/image';
 import { useState, useEffect } from "react";
 import { InventoryForm } from "@/components/forms/inventory-form";
+import { useToast } from "@/hooks/use-toast";
 
 export default function InventoryDetailsPage() {
+  const router = useRouter();
+  const { toast } = useToast();
   const params = useParams();
   const itemId = params.id as string;
   
@@ -21,6 +24,7 @@ export default function InventoryDetailsPage() {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
+    // In a real app, you'd fetch this from a DB
     const foundItem = inventory.find(i => i.id === itemId);
     setItem(foundItem);
   }, [itemId, inventory]);
@@ -47,9 +51,30 @@ export default function InventoryDetailsPage() {
       showInPOS: (formData.get("showInPOS") as string) === 'on',
     };
 
-    setInventory(inventory.map(i => i.id === item.id ? updatedItemData : i));
+    const newInventory = inventory.map(i => i.id === item.id ? updatedItemData : i);
+    setInventory(newInventory);
+    // In a real app, you would also save this to local storage or a DB
+    setItem(updatedItemData);
     setIsEditing(false);
+    toast({
+        title: "Item Updated",
+        description: `${updatedItemData.name} has been successfully updated.`
+    });
   };
+
+  const handleDeleteItem = () => {
+    if (!item) return;
+
+    const newInventory = inventory.filter(i => i.id !== item.id);
+    setInventory(newInventory);
+    // In a real app, you would also save this to local storage or a DB
+    toast({
+        variant: "destructive",
+        title: "Item Deleted",
+        description: `${item.name} has been removed from inventory.`
+    });
+    router.push("/admin/inventory");
+  }
 
   return (
     <div className="space-y-8">
@@ -65,8 +90,8 @@ export default function InventoryDetailsPage() {
       </PageHeader>
 
       <div className="grid gap-8 md:grid-cols-3">
-        <div className="flex flex-col gap-8 md:col-span-1 md:flex-col-reverse">
-             <Card className="order-first md:order-last">
+        <div className="flex flex-col gap-8 md:col-span-1">
+             <Card>
                 <CardHeader>
                     <CardTitle>Product Image</CardTitle>
                 </CardHeader>
@@ -102,7 +127,7 @@ export default function InventoryDetailsPage() {
                                     <Save className="mr-2 h-4 w-4" />
                                     Save Changes
                                 </Button>
-                                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                                <Button variant="outline" type="button" onClick={() => setIsEditing(false)}>
                                     Cancel
                                 </Button>
                             </>
@@ -112,7 +137,7 @@ export default function InventoryDetailsPage() {
                                     <Edit className="mr-2 h-4 w-4" />
                                     Edit Item
                                 </Button>
-                                <Button type="button" variant="destructive">
+                                <Button type="button" variant="destructive" onClick={handleDeleteItem}>
                                     <Trash className="mr-2 h-4 w-4" />
                                     Delete Item
                                 </Button>

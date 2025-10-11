@@ -92,19 +92,19 @@
 }
 
 @layer utilities {
-    [data-sidebar="content"], [data-custom-scrollbar] {
+    [data-sidebar-content], [data-custom-scrollbar] {
         scrollbar-width: thin;
         scrollbar-color: hsl(var(--primary)) hsl(var(--background));
     }
-    [data-sidebar="content"]::-webkit-scrollbar, [data-custom-scrollbar]::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+    [data-sidebar-content]::-webkit-scrollbar, [data-custom-scrollbar]::-webkit-scrollbar {
+        width: 2px;
+        height: 2px;
     }
-    [data-sidebar="content"]::-webkit-scrollbar-track, [data-custom-scrollbar]::-webkit-scrollbar-track {
-        background-color: hsl(var(--muted));
+    [data-sidebar-content]::-webkit-scrollbar-track, [data-custom-scrollbar]::-webkit-scrollbar-track {
+        background-color: transparent;
     }
-    [data-sidebar="content"]::-webkit-scrollbar-thumb, [data-custom-scrollbar]::-webkit-scrollbar-thumb {
+    [data-sidebar-content]::-webkit-scrollbar-thumb, [data-custom-scrollbar]::-webkit-scrollbar-thumb {
         background-color: hsl(var(--primary));
-        border-radius: 3px;
+        border-radius: 2px;
     }
 }

@@ -49,7 +49,7 @@ export default function AdminLayout({
               </PopoverContent>
             </Popover>
           </header>
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1 overflow-y-auto" data-custom-scrollbar>
             <div className="p-4 md:p-8">{children}</div>
           </main>
         </div>

@@ -1,5 +1,6 @@
 
-import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate } from './types';
+
+import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate, FinancialBreakdown } from './types';
 
 export const locations: Location[] = [
   { id: 'L01', name: 'FitSync Meru', type: 'Main', address: '123 Meru-Nanyuki Rd, Meru', members: 450 },
@@ -213,6 +214,52 @@ export const peakHoursData: Record<string, { hour: string, members: number }[]> 
     { hour: '8PM', members: 50 },
   ],
 };
+
+export const revenueBreakdownData: Record<string, FinancialBreakdown[]> = {
+  'L01': [
+    { name: 'Membership Fees', value: 850000 },
+    { name: 'Personal Training', value: 250000 },
+    { name: 'Walk-in Services', value: 150000 },
+    { name: 'Product Sales', value: 100000 },
+  ],
+  'L02': [
+    { name: 'Membership Fees', value: 950000 },
+    { name: 'Personal Training', value: 350000 },
+    { name: 'Walk-in Services', value: 180000 },
+    { name: 'Product Sales', value: 120000 },
+  ],
+  'L03': [
+    { name: 'Membership Fees', value: 650000 },
+    { name: 'Personal Training', value: 150000 },
+    { name: 'Walk-in Services', value: 100000 },
+    { name: 'Product Sales', value: 50000 },
+  ],
+};
+
+export const expenseBreakdownData: Record<string, FinancialBreakdown[]> = {
+  'L01': [
+    { name: 'Salaries', value: 400000 },
+    { name: 'Rent', value: 300000 },
+    { name: 'Utilities', value: 100000 },
+    { name: 'Equipment', value: 150000 },
+    { name: 'Marketing', value: 50000 },
+  ],
+  'L02': [
+    { name: 'Salaries', value: 500000 },
+    { name: 'Rent', value: 400000 },
+    { name: 'Utilities', value: 120000 },
+    { name: 'Equipment', value: 200000 },
+    { name: 'Marketing', value: 80000 },
+  ],
+  'L03': [
+    { name: 'Salaries', value: 300000 },
+    { name: 'Rent', value: 250000 },
+    { name: 'Utilities', value: 80000 },
+    { name: 'Equipment', value: 100000 },
+    { name: 'Marketing', value: 40000 },
+  ],
+};
+
 
 export const plans: Plan[] = [
   {

@@ -1,4 +1,5 @@
 
+
 export type Member = {
   id: string;
   locationId: string;
@@ -130,4 +131,8 @@ export type BlockedDate = {
   reason: string;
 };
 
-    
+export type FinancialBreakdown = {
+    name: string;
+    value: number;
+    fill?: string;
+};
