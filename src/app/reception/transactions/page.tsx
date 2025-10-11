@@ -207,7 +207,7 @@ export default function TransactionsPage() {
               <Input
                 id="resend-email"
                 type="email"
-                placeholder="customer@example.com"
+                placeholder="customer@fitsync.com"
                 value={receiptEmail}
                 onChange={(e) => setReceiptEmail(e.target.value)}
               />

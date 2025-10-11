@@ -44,6 +44,7 @@ export default function InventoryDetailsPage() {
       subCategory: formData.get("subCategory") as string,
       quantity: Number(formData.get("quantity")),
       price: Number(formData.get("price")),
+      showInPOS: (formData.get("showInPOS") as string) === 'on',
     };
 
     setInventory(inventory.map(i => i.id === item.id ? updatedItemData : i));

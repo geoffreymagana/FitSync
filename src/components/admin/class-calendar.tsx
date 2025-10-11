@@ -22,21 +22,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Class, Trainer, BlockedDate } from "@/lib/types";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
-import { blockedDates as initialBlockedDates } from "@/lib/data";
+import { blockedDates as initialBlockedDates, classes as initialClasses } from "@/lib/data";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Switch } from "../ui/switch";
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useToast } from "@/hooks/use-toast";
 
+const LOCAL_STORAGE_KEY = 'fitsync_all_classes';
+
 interface ClassCalendarProps {
-  classes: Class[];
-  allClasses: Class[];
-  setClasses: React.Dispatch<React.SetStateAction<Class[]>>;
+  locationId: string;
   trainers: Trainer[];
-  onAddClass: (newClass: Omit<Class, 'id' | 'locationId' | 'booked'>) => Class;
-  onUpdateClass: (updatedClass: Class) => void;
+  role?: 'admin' | 'instructor';
+  instructorName?: string;
 }
 
 const generateTimeSlots = (date: Date) => {
@@ -58,6 +58,8 @@ const ClassForm = ({
   classData,
   classesForDay,
   onAddRecurring,
+  role = 'admin',
+  instructorName,
 }: {
   selectedDate: Date;
   trainers: Trainer[];
@@ -65,6 +67,8 @@ const ClassForm = ({
   classData?: Class | null;
   classesForDay: Class[];
   onAddRecurring: (data: any, recurrence: any) => void;
+  role?: 'admin' | 'instructor';
+  instructorName?: string;
 }) => {
     const { toast } = useToast();
     const today = format(new Date(), "yyyy-MM-dd");
@@ -93,7 +97,7 @@ const ClassForm = ({
         const formData = new FormData(event.currentTarget);
         const data = {
             name: formData.get("name") as string,
-            trainer: formData.get("trainer") as string,
+            trainer: role === 'instructor' && instructorName ? instructorName : formData.get("trainer") as string,
             date: formData.get("date") as string,
             time: formData.get("time") as string,
             spots: Number(formData.get("spots")),
@@ -125,16 +129,20 @@ const ClassForm = ({
         </div>
         <div className="space-y-2">
           <Label htmlFor="trainer">Trainer</Label>
-          <Select name="trainer" defaultValue={classData?.trainer} required>
-            <SelectTrigger id="trainer">
-              <SelectValue placeholder="Select a trainer" />
-            </SelectTrigger>
-            <SelectContent>
-              {trainers.map(t => (
-                <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {role === 'instructor' ? (
+            <p className="font-semibold text-muted-foreground pt-2">{instructorName}</p>
+          ) : (
+            <Select name="trainer" defaultValue={classData?.trainer} required>
+              <SelectTrigger id="trainer">
+                <SelectValue placeholder="Select a trainer" />
+              </SelectTrigger>
+              <SelectContent>
+                {trainers.map(t => (
+                  <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -219,7 +227,28 @@ const ClassForm = ({
 };
 
 
-const ScheduleGridCalendar = ({ classes, trainers, onAddClass, onUpdateClass, setClasses, allClasses }: Omit<ClassCalendarProps, 'date' | 'setDate'>) => {
+const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructorName }: ClassCalendarProps) => {
+  const [allClasses, setAllClasses] = useState<Class[]>(() => {
+    if (typeof window === 'undefined') return initialClasses;
+    try {
+        const storedClasses = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+        return storedClasses ? JSON.parse(storedClasses) : initialClasses;
+    } catch (error) {
+        console.error("Error reading classes from local storage", error);
+        return initialClasses;
+    }
+  });
+
+  useEffect(() => {
+    try {
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(allClasses));
+        }
+    } catch (error) {
+        console.error("Error writing classes to local storage", error);
+    }
+  }, [allClasses]);
+  
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -238,7 +267,8 @@ const ScheduleGridCalendar = ({ classes, trainers, onAddClass, onUpdateClass, se
   }, [allClasses]);
 
   const classesByDate = useMemo(() => {
-    return classes.reduce((acc, cls) => {
+    return allClasses.reduce((acc, cls) => {
+      if (cls.locationId !== locationId) return acc;
       const classDate = cls.date;
       if (!acc[classDate]) {
         acc[classDate] = [];
@@ -246,7 +276,7 @@ const ScheduleGridCalendar = ({ classes, trainers, onAddClass, onUpdateClass, se
       acc[classDate].push({ ...cls, color: classColors[cls.name] });
       return acc;
     }, {} as Record<string, Class[]>);
-  }, [classes, classColors]);
+  }, [allClasses, locationId, classColors]);
 
   const blockedDatesMap = useMemo(() => {
       return blockedDates.reduce((acc, bd) => {
@@ -274,8 +304,14 @@ const ScheduleGridCalendar = ({ classes, trainers, onAddClass, onUpdateClass, se
     setIsBlockDialogOpen(true);
   }
   
-  const handleAddClass = (data: any) => {
-    onAddClass(data);
+  const handleAddClass = (data: Omit<Class, 'id' | 'locationId' | 'booked'>) => {
+    const newClass: Class = {
+        id: `C${Date.now()}-${Math.random()}`,
+        ...data,
+        booked: 0,
+        locationId,
+    };
+    setAllClasses(prev => [...prev, newClass]);
     setIsAddDialogOpen(false);
   };
 
@@ -284,30 +320,40 @@ const ScheduleGridCalendar = ({ classes, trainers, onAddClass, onUpdateClass, se
       const startDate = parseISO(classData.date);
       const finalEndDate = parseISO(endDate);
 
+      if (!recurrence.days || recurrence.days.length === 0 || !recurrence.endDate) {
+        toast({ variant: 'destructive', title: 'Missing Information', description: 'Please select recurrence days and an end date.' });
+        return;
+      }
+
       const weekDayMap = { '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '0': 0 };
 
       const recurrenceDaysAsNumbers = days.map((d: string) => weekDayMap[d as keyof typeof weekDayMap]);
 
-      let newClasses: Class[] = [];
+      let newClassesBatch: Class[] = [];
 
-      let currentDate = startDate;
+      let currentDay = startDate;
 
-      while(currentDate <= finalEndDate) {
-          if (recurrenceDaysAsNumbers.includes(getDay(currentDate))) {
-              const formattedDate = format(currentDate, 'yyyy-MM-dd');
+      while(currentDay <= finalEndDate) {
+          if (recurrenceDaysAsNumbers.includes(getDay(currentDay))) {
+              const formattedDate = format(currentDay, 'yyyy-MM-dd');
               if (!blockedDatesMap[formattedDate]) {
-                  const newClass = onAddClass({ ...classData, date: formattedDate });
-                  newClasses.push(newClass);
+                  const newClass = { 
+                      id: `C${Date.now()}-${Math.random()}`,
+                      ...classData, 
+                      date: formattedDate,
+                      booked: 0,
+                      locationId,
+                    };
+                  newClassesBatch.push(newClass);
               }
           }
-          currentDate = addDays(currentDate, 1);
+          currentDay = addDays(currentDay, 1);
       }
       
-      setClasses(prev => [...prev, ...newClasses]);
-      toast({ title: 'Success', description: `${newClasses.length} recurring classes have been added.` });
+      setAllClasses(prev => [...prev, ...newClassesBatch]);
+      toast({ title: 'Success', description: `${newClassesBatch.length} recurring classes have been added.` });
       setIsAddDialogOpen(false);
   }
-
 
   const handleBlockDay = () => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
@@ -342,19 +388,26 @@ const ScheduleGridCalendar = ({ classes, trainers, onAddClass, onUpdateClass, se
             <span className="truncate">{blockedDatesMap[formattedDay]}</span>
           </div>
         )}
-        {dayClasses.map((cls) => (
-          <Link
-            key={cls.id}
-            href={`/admin/schedule/${cls.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="block"
-          >
-            <div className={cn("p-1 rounded-md text-xs text-black", cls.color)}>
-              <p className="font-semibold truncate">{cls.name}</p>
-              <p className="truncate">{cls.time}</p>
-            </div>
-          </Link>
-        ))}
+        {dayClasses.map((cls) => {
+          const href = role === 'instructor' 
+            ? `/instructor/schedule/${cls.id}`
+            : `/admin/schedule/${cls.id}`;
+          
+          return (
+            <Link
+              key={cls.id}
+              href={href}
+              onClick={(e) => e.stopPropagation()}
+              className="block"
+            >
+              <div className={cn("p-1 rounded-md text-xs text-black", cls.color, role === 'instructor' && cls.trainer !== instructorName ? 'opacity-50 border border-dashed border-gray-500' : '')}>
+                <p className="font-semibold truncate">{cls.name}</p>
+                <p className="truncate">{cls.time}</p>
+                {role === 'instructor' && cls.trainer !== instructorName && <p className="truncate text-[10px]">({cls.trainer})</p>}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     );
     
@@ -380,11 +433,11 @@ const ScheduleGridCalendar = ({ classes, trainers, onAddClass, onUpdateClass, se
                   </PopoverTrigger>
                   <PopoverContent className="w-48 p-2">
                       <Button variant="ghost" className="w-full justify-start" onClick={() => openAddDialog(day)}>Add Class</Button>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => openBlockDialog(day)}>Block Day</Button>
+                      {role === 'admin' && <Button variant="ghost" className="w-full justify-start" onClick={() => openBlockDialog(day)}>Block Day</Button>}
                   </PopoverContent>
               </Popover>
             )}
-            {isBlocked && (
+            {isBlocked && role === 'admin' && (
               <Button variant="ghost" size="icon" className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 h-6 w-6" onClick={() => handleUnblockDay(day)}>
                   <Unlock className="h-4 w-4" />
               </Button>
@@ -428,8 +481,10 @@ const ScheduleGridCalendar = ({ classes, trainers, onAddClass, onUpdateClass, se
                 selectedDate={selectedDate} 
                 trainers={trainers} 
                 onSave={handleAddClass} 
-                classesForDay={classesByDate[format(selectedDate, 'yyyy-MM-dd')] || []}
+                classesForDay={allClasses.filter(c => c.date === format(selectedDate, 'yyyy-MM-dd') && c.locationId === locationId)}
                 onAddRecurring={handleAddRecurringClasses}
+                role={role}
+                instructorName={instructorName}
               />
           </DialogContent>
       </Dialog>

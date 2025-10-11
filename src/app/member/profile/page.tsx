@@ -13,11 +13,11 @@ export default function MemberProfilePage() {
         <div className="p-4 md:p-6 space-y-6">
             <div className="flex items-center gap-4">
                 <Avatar className="w-20 h-20">
-                    <AvatarImage src="https://picsum.photos/seed/member-jelani/100/100" data-ai-hint="person smiling" />
-                    <AvatarFallback>JK</AvatarFallback>
+                    <AvatarImage src="https://picsum.photos/seed/member1/100/100" data-ai-hint="person smiling" />
+                    <AvatarFallback>WM</AvatarFallback>
                 </Avatar>
                 <div>
-                    <h1 className="text-2xl font-bold">Jelani Karanja</h1>
+                    <h1 className="text-2xl font-bold">Wanjiku Mwangi</h1>
                     <p className="text-muted-foreground">Premium Member</p>
                 </div>
             </div>

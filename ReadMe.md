@@ -1,3 +1,4 @@
+
 # FitSync - Gym Management System
 
 FitSync is a comprehensive, all-in-one management solution designed for modern fitness centers. It provides a suite of tools for administrators, receptionists, instructors, and members to streamline operations, enhance member engagement, and manage all aspects of a gym's day-to-day activities.
@@ -110,7 +111,132 @@ npm run dev
 
 The application will be available at [http://localhost:9002](http://localhost:9002).
 
-### Project Structure
+---
+
+## Deployment & Setup Strategies
+
+This section provides guidance for deploying FitSync in different environments.
+
+### Strategy 1: On-Premise Setup (Local Network Access)
+
+This setup is ideal for gyms that want to host the staff-facing dashboards (Reception, Instructor) on a local server, accessible only from within the gym's Wi-Fi network.
+
+**Use Case:** A receptionist at the front desk or an instructor on the gym floor accesses their dashboard from a tablet or computer connected to the gym's private network.
+
+#### On-Premise Setup Steps:
+
+1.  **Prepare a Server:**
+    - Designate a reliable computer or a small server (e.g., an Intel NUC or similar) that will run 24/7 on the gym's local network.
+    - Install **Node.js (v18 or later)** on this machine.
+    - Ensure this server has a **static IP address** on the local network (e.g., `192.168.1.100`) so its address doesn't change.
+
+2.  **Build the Application for Production:**
+    - On the server machine, navigate to the project directory.
+    - Run the build command:
+      ```bash
+      npm run build
+      ```
+      This creates an optimized production version of the application.
+
+3.  **Run the Production Server:**
+    - Start the application using the following command, specifying the port you want it to run on (e.g., port 3000).
+      ```bash
+      npm start -- -p 3000
+      ```
+
+4.  **Accessing the Dashboards:**
+    - Staff members can now access the application by opening a web browser on any device connected to the gym's Wi-Fi and navigating to the server's local IP address and port.
+    - **Example URLs:**
+      - **Reception:** `http://192.168.1.100:3000/login/reception`
+      - **Instructor:** `http://192.168.1.100:3000/login/instructor`
+    - For easy access, you can create shortcuts or browser bookmarks on staff devices.
+
+5.  **Geofencing Note:**
+    - This setup achieves a basic form of "geofencing" because the application is only accessible to devices connected to the gym's internal network. No one outside the gym's Wi-Fi can reach it.
+
+### Strategy 2: Multi-Domain Deployment for Security
+
+This advanced strategy provides maximum security and separation of concerns by deploying each user-facing application to its own unique subdomain.
+
+**Use Case:** A large fitness chain wants to ensure that member data, admin functions, and staff tools are completely isolated from each other.
+
+**Example Domain Structure:**
+- **Member Dashboard:** `app.fitsync.com`
+- **Admin Dashboard:** `admin.fitsync.com`
+- **Reception & Instructor Dashboards:** `staff.fitsync.com`
+
+This architecture requires a hosting provider that supports custom domains and environment variables (like Vercel, Netlify, or AWS Amplify). The core idea is to use **Next.js Rewrites** and middleware to route traffic based on the hostname.
+
+#### Multi-Domain Setup Steps (Example with Vercel):
+
+1.  **Configure Custom Domains:**
+    - In your hosting provider (e.g., Vercel), add your custom domains/subdomains to the project.
+      - `app.fitsync.com`
+      - `admin.fitsync.com`
+      - `staff.fitsync.com`
+      - `fitsync.com` (for the main landing page)
+
+2.  **Update Next.js Config for Routing:**
+    - Modify your `next.config.ts` to implement rewrite rules based on the hostname. This tells Next.js which part of your application to serve for each domain.
+
+    ```ts
+    // next.config.ts
+
+    import type { NextConfig } from 'next';
+
+    const nextConfig: NextConfig = {
+      // ... other configs
+      async rewrites() {
+        return [
+          // Main Landing Page
+          {
+            source: '/:path*',
+            destination: '/:path*',
+            has: [{ type: 'host', value: 'www.fitsync.com|fitsync.com' }],
+          },
+          // Member App
+          {
+            source: '/:path*',
+            destination: '/member/:path*',
+            has: [{ type: 'host', value: 'app.fitsync.com' }],
+          },
+          // Admin App
+          {
+            source: '/:path*',
+            destination: '/admin/:path*',
+            has: [{ type: 'host', value: 'admin.fitsync.com' }],
+          },
+           // Staff App (Reception & Instructor)
+          {
+            source: '/reception/:path*',
+            destination: '/reception/:path*',
+            has: [{ type: 'host', value: 'staff.fitsync.com' }],
+          },
+          {
+            source: '/instructor/:path*',
+            destination: '/instructor/:path*',
+            has: [{ type: 'host', value: 'staff.fitsync.com' }],
+          },
+           // Route the login pages for staff
+          {
+            source: '/:path*',
+            destination: '/login/:path*',
+            has: [{ type: 'host', value: 'staff.fitsync.com' }],
+          },
+        ];
+      },
+    };
+
+    export default nextConfig;
+    ```
+
+3.  **Deployment:**
+    - Deploy your application. The hosting provider, combined with the Next.js config, will now handle the routing automatically.
+    - When a user visits `admin.fitsync.com`, Next.js will serve the content from the `/src/app/admin` directory, effectively isolating it from the other dashboards.
+
+---
+
+## Project Structure
 
 The project follows the standard Next.js App Router structure.
 
@@ -128,3 +254,4 @@ The project follows the standard Next.js App Router structure.
 -   **/public/**: Static assets.
 -   **tailwind.config.ts**: Configuration for Tailwind CSS.
 -   **next.config.ts**: Configuration for Next.js.
+```

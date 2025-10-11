@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { inventory as initialInventory, InventoryItem } from "@/lib/data";
+import { Switch } from "../ui/switch";
 
 const categories = [...new Set(initialInventory.map(item => item.category))];
 const subCategories = [...new Set(initialInventory.map(item => item.subCategory))];
@@ -45,6 +46,11 @@ export function InventoryForm({ item, isEditing = false }: InventoryFormProps) {
             <div className="font-semibold">Price</div>
             <div className="text-muted-foreground">KES {item.price.toLocaleString()}</div>
           </div>
+        </div>
+        <Separator />
+        <div className="grid gap-3">
+            <div className="font-semibold">Show in POS</div>
+            <div className="text-muted-foreground">{item.showInPOS ? 'Yes' : 'No'}</div>
         </div>
       </div>
     );
@@ -89,6 +95,15 @@ export function InventoryForm({ item, isEditing = false }: InventoryFormProps) {
           <Label htmlFor="price">Price (KES)</Label>
           <Input id="price" name="price" type="number" placeholder="2500" defaultValue={item?.price} required />
         </div>
+      </div>
+      <div className="flex items-center space-x-2 rounded-md border p-4">
+        <Switch id="showInPOS" name="showInPOS" defaultChecked={item?.showInPOS} />
+        <Label htmlFor="showInPOS" className="flex flex-col space-y-1">
+            <span>Show in POS</span>
+            <span className="font-normal leading-snug text-muted-foreground">
+                Make this item available for sale in the reception walk-in (POS) screen.
+            </span>
+        </Label>
       </div>
     </div>
   );

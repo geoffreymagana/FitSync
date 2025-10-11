@@ -171,7 +171,7 @@ export default function MembersPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" placeholder="john@example.com" required />
+                <Input id="email" name="email" type="email" placeholder="member@fitsync.com" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="plan">Membership Plan</Label>

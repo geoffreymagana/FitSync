@@ -49,7 +49,7 @@ export default function MemberSignUpPage() {
             <Input
               id="email"
               type="email"
-              placeholder="member@example.com"
+              placeholder="member@fitsync.com"
               required
             />
           </div>

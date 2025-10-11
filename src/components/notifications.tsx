@@ -1,11 +1,14 @@
+
 "use client";
 
 import { notifications } from "@/lib/data";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
+import { Notification } from "@/lib/types";
 
-export function Notifications() {
-  const unreadNotifications = notifications.filter(n => !n.read);
+export function Notifications({ role = 'admin' }: { role?: 'admin' | 'instructor' | 'member' | 'reception' }) {
+  const roleNotifications: Notification[] = notifications[role] || [];
+  const unreadNotifications = roleNotifications.filter(n => !n.read);
 
   return (
     <div>
@@ -16,9 +19,9 @@ export function Notifications() {
             )}
         </div>
         
-        {notifications.length > 0 ? (
+        {roleNotifications.length > 0 ? (
             <div className="space-y-4">
-                {notifications.map(notification => (
+                {roleNotifications.map(notification => (
                     <div key={notification.id} className="flex items-start space-x-3">
                          {!notification.read && <div className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />}
                         <div className="flex-1 space-y-1">

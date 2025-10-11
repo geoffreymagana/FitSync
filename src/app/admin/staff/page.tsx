@@ -151,7 +151,7 @@ export default function StaffPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" placeholder="jane@fitsync.com" required />
+                <Input id="email" name="email" type="email" placeholder="staff@fitsync.com" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>

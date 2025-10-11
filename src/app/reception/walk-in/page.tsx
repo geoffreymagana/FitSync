@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { walkInServices } from "@/lib/data";
+import { walkInServices as initialWalkInServices, inventory } from "@/lib/data";
 import { WalkInService, OrderItem, Transaction } from "@/lib/types";
 import { useState, useMemo, useEffect, useContext } from "react";
-import { CreditCard, Smartphone, Plus, Minus, X, CheckCircle, Mail, Banknote } from "lucide-react";
+import { CreditCard, Smartphone, Plus, Minus, X, CheckCircle, Mail, Banknote, Shirt } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -52,6 +52,20 @@ export default function WalkInPage() {
     const { toast } = useToast();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [lastCompletedTransaction, setLastCompletedTransaction] = useState<Transaction | null>(null);
+
+    const posItems = useMemo(() => {
+        const inventoryForPOS = inventory
+            .filter(item => item.showInPOS)
+            .map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                color: 'rgba(107, 114, 128, 0.8)', // default color for inventory items
+                icon: 'Package', // default icon
+                category: item.category,
+            }));
+        return [...initialWalkInServices, ...inventoryForPOS];
+    }, []);
 
     useEffect(() => {
         const storedTransactions = localStorage.getItem('walkInTransactions');
@@ -175,7 +189,7 @@ export default function WalkInPage() {
     };
     
     const serviceCategories = useMemo(() => {
-        return walkInServices.reduce((acc, service) => {
+        return posItems.reduce((acc, service) => {
             const category = service.category || 'Uncategorized';
             if (!acc[category]) {
                 acc[category] = [];
@@ -183,7 +197,7 @@ export default function WalkInPage() {
             acc[category].push(service);
             return acc;
         }, {} as Record<string, WalkInService[]>);
-    }, []);
+    }, [posItems]);
 
     return (
         <div className="h-screen bg-muted/20 lg:h-[calc(100vh-64px)]">
@@ -206,7 +220,7 @@ export default function WalkInPage() {
                                 <Input 
                                     id="receipt-email" 
                                     type="email" 
-                                    placeholder="customer@email.com" 
+                                    placeholder="customer@fitsync.com" 
                                     className="pl-10"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}

@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -38,7 +39,7 @@ export default function AdminLoginPage() {
             <Input
               id="email"
               type="email"
-              placeholder="admin@example.com"
+              placeholder="admin@fitsync.com"
               required
             />
           </div>

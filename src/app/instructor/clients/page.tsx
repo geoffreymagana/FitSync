@@ -11,6 +11,7 @@ import { MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import Link from "next/link";
 
 // For this prototype, we'll just assign a few members to the instructor
 const instructorClients = initialMembers.filter(m => ['M001', 'M004', 'M006'].includes(m.id));
@@ -72,8 +73,12 @@ export default function InstructorClientsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>View Profile</DropdownMenuItem>
-                          <DropdownMenuItem>Message</DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/instructor/clients/${member.id}`}>View Profile</Link>
+                            </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/instructor/messages/${member.id}`}>Message</Link>
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

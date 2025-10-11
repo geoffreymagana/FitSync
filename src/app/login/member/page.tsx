@@ -41,7 +41,7 @@ export default function MemberLoginPage() {
               type="email"
               placeholder="member@example.com"
               required
-              defaultValue="member@fitsync.com"
+              defaultValue="wanjiku.m@example.com"
             />
           </div>
           <div className="grid gap-2">

@@ -33,7 +33,7 @@ export default function MemberDashboardPage() {
 
     return (
         <div className="p-4 md:p-6 space-y-6">
-            <PageHeader title="Welcome, Jelani!" />
+            <PageHeader title="Welcome, Wanjiku!" />
             
             <Card>
                 <CardHeader>
@@ -95,34 +95,36 @@ export default function MemberDashboardPage() {
                                 <DialogTitle>Log a Workout</DialogTitle>
                                 <DialogDescription>Record your latest training session.</DialogDescription>
                             </DialogHeader>
-                            <div className="space-y-4 py-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="workout-type">Workout Type</Label>
-                                    <Select>
-                                        <SelectTrigger id="workout-type">
-                                            <SelectValue placeholder="Select a type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="cardio">Cardio</SelectItem>
-                                            <SelectItem value="strength">Strength Training</SelectItem>
-                                            <SelectItem value="flexibility">Flexibility</SelectItem>
-                                            <SelectItem value="sports">Sports</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                             <form onSubmit={(e) => { e.preventDefault(); handleLogSubmit('Workout'); }}>
+                                <div className="space-y-4 py-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="workout-type">Workout Type</Label>
+                                        <Select name="workout-type" required>
+                                            <SelectTrigger id="workout-type">
+                                                <SelectValue placeholder="Select a type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="cardio">Cardio</SelectItem>
+                                                <SelectItem value="strength">Strength Training</SelectItem>
+                                                <SelectItem value="flexibility">Flexibility</SelectItem>
+                                                <SelectItem value="sports">Sports</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="duration">Duration (minutes)</Label>
+                                        <Input id="duration" name="duration" type="number" min="1" max="240" placeholder="60" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="calories">Calories Burned (optional)</Label>
+                                        <Input id="calories" name="calories" type="number" min="0" max="5000" placeholder="300" />
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="duration">Duration (minutes)</Label>
-                                    <Input id="duration" type="number" placeholder="60" />
-                                </div>
-                                 <div className="space-y-2">
-                                    <Label htmlFor="calories">Calories Burned (optional)</Label>
-                                    <Input id="calories" type="number" placeholder="300" />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsWorkoutDialogOpen(false)}>Cancel</Button>
-                                <Button onClick={() => handleLogSubmit('Workout')}>Log Workout</Button>
-                            </DialogFooter>
+                                <DialogFooter>
+                                    <Button type="button" variant="outline" onClick={() => setIsWorkoutDialogOpen(false)}>Cancel</Button>
+                                    <Button type="submit">Log Workout</Button>
+                                </DialogFooter>
+                            </form>
                         </DialogContent>
                     </Dialog>
                      <Dialog open={isMealDialogOpen} onOpenChange={setIsMealDialogOpen}>
@@ -137,34 +139,36 @@ export default function MemberDashboardPage() {
                                 <DialogTitle>Log a Meal</DialogTitle>
                                 <DialogDescription>Keep track of your nutrition.</DialogDescription>
                             </DialogHeader>
-                            <div className="space-y-4 py-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="meal-type">Meal Type</Label>
-                                    <Select>
-                                        <SelectTrigger id="meal-type">
-                                            <SelectValue placeholder="Select a meal" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="breakfast">Breakfast</SelectItem>
-                                            <SelectItem value="lunch">Lunch</SelectItem>
-                                            <SelectItem value="dinner">Dinner</SelectItem>
-                                            <SelectItem value="snack">Snack</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                             <form onSubmit={(e) => { e.preventDefault(); handleLogSubmit('Meal'); }}>
+                                <div className="space-y-4 py-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="meal-type">Meal Type</Label>
+                                        <Select name="meal-type" required>
+                                            <SelectTrigger id="meal-type">
+                                                <SelectValue placeholder="Select a meal" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="breakfast">Breakfast</SelectItem>
+                                                <SelectItem value="lunch">Lunch</SelectItem>
+                                                <SelectItem value="dinner">Dinner</SelectItem>
+                                                <SelectItem value="snack">Snack</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="meal-description">Description</Label>
+                                        <Input id="meal-description" name="meal-description" placeholder="e.g., Chicken salad, apple" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="meal-calories">Calories (optional)</Label>
+                                        <Input id="meal-calories" name="meal-calories" type="number" min="0" max="5000" placeholder="500" />
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="meal-description">Description</Label>
-                                    <Input id="meal-description" placeholder="e.g., Chicken salad, apple" />
-                                </div>
-                                 <div className="space-y-2">
-                                    <Label htmlFor="meal-calories">Calories (optional)</Label>
-                                    <Input id="meal-calories" type="number" placeholder="500" />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsMealDialogOpen(false)}>Cancel</Button>
-                                <Button onClick={() => handleLogSubmit('Meal')}>Log Meal</Button>
-                            </DialogFooter>
+                                <DialogFooter>
+                                    <Button type="button" variant="outline" onClick={() => setIsMealDialogOpen(false)}>Cancel</Button>
+                                    <Button type="submit">Log Meal</Button>
+                                </DialogFooter>
+                            </form>
                         </DialogContent>
                     </Dialog>
                 </CardContent>

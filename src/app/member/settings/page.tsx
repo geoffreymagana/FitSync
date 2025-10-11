@@ -41,11 +41,11 @@ export default function MemberSettingsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" defaultValue="Jelani Karanja" />
+                <Input id="name" defaultValue="Wanjiku Mwangi" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="member@fitsync.com" />
+                <Input id="email" type="email" defaultValue="wanjiku.m@example.com" />
               </div>
             </CardContent>
             <CardFooter>

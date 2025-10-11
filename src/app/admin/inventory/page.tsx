@@ -37,6 +37,7 @@ export default function InventoryPage() {
       subCategory: formData.get("subCategory") as string,
       quantity: Number(formData.get("quantity")),
       price: Number(formData.get("price")),
+      showInPOS: (formData.get("showInPOS") as string) === 'on',
     };
     setInventory([...inventory, newItem]);
     setIsAddDialogOpen(false);
@@ -57,6 +58,7 @@ export default function InventoryPage() {
       subCategory: formData.get("subCategory") as string,
       quantity: Number(formData.get("quantity")),
       price: Number(formData.get("price")),
+      showInPOS: (formData.get("showInPOS") as string) === 'on',
     };
 
     setInventory(inventory.map(item => item.id === selectedItem.id ? updatedItem : item));

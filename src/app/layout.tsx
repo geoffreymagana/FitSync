@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: 'FitSync',
   description: 'The all-in-one management solution for your fitness center.',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({

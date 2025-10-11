@@ -47,7 +47,7 @@ export default function ReceptionLayout({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
-                <Notifications />
+                <Notifications role="reception" />
               </PopoverContent>
             </Popover>
           </header>

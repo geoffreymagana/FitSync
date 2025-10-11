@@ -45,7 +45,7 @@ export default function InstructorLayout({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
-                <Notifications />
+                <Notifications role="instructor" />
               </PopoverContent>
             </Popover>
           </header>

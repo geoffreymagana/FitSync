@@ -87,9 +87,9 @@ export const blockedDates: BlockedDate[] = [
 
 
 export const recentActivities: Activity[] = [
-    { id: 'A01', description: 'Checked in for HIIT Blast.', timestamp: '5 min ago', member: { name: 'Kiprono Bett', avatarUrl: 'https://picsum.photos/seed/member4/100/100' } },
-    { id: 'A02', description: 'Booked a spot in Morning Yoga.', timestamp: '15 min ago', member: { name: 'Wanjiku Mwangi', avatarUrl: 'https://picsum.photos/seed/member1/100/100' } },
-    { id: 'A03', description: 'Membership renewed (Premium).', timestamp: '1 hour ago', member: { name: 'Omondi Okoth', avatarUrl: 'https://picsum.photos/seed/member2/100/100' } },
+    { id: 'A01', description: 'Checked in successfully.', timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(), member: { id: 'M004', name: 'Kiprono Bett', avatarUrl: 'https://picsum.photos/seed/member4/100/100' } },
+    { id: 'A02', description: 'Booked a spot in Morning Yoga.', timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(), member: { id: 'M001', name: 'Wanjiku Mwangi', avatarUrl: 'https://picsum.photos/seed/member1/100/100' } },
+    { id: 'A03', description: 'Membership renewed (Premium).', timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString(), member: { id: 'M002', name: 'Omondi Okoth', avatarUrl: 'https://picsum.photos/seed/member2/100/100' } },
 ];
 
 export const payments: Payment[] = [
@@ -246,12 +246,27 @@ export const plans: Plan[] = [
   },
 ];
 
-export const notifications: Notification[] = [
-  { id: 'N01', title: 'New Member Sign-up', description: 'Njeri Kamau has signed up for the Basic plan at FitSync Meru.', timestamp: '5 minutes ago', read: false },
-  { id: 'N02', title: 'Payment Failed', description: 'Fatuma Ali\'s VIP membership payment of KES 8,000 failed.', timestamp: '1 hour ago', read: false },
-  { id: 'N03', title: 'Class Almost Full', description: 'Zumba Party at FitSync Meru is almost full (28/30).', timestamp: '3 hours ago', read: true },
-  { id: 'N04', title: 'New Member Sign-up', description: 'Naliaka Wanjala has signed up for the Basic plan at FitSync Mombasa.', timestamp: 'Yesterday', read: true },
-];
+export const notifications: Record<string, Notification[]> = {
+    admin: [
+        { id: 'N01', title: 'New Member Sign-up', description: 'Njeri Kamau has signed up for the Basic plan at FitSync Meru.', timestamp: '5 minutes ago', read: false },
+        { id: 'N02', title: 'Payment Failed', description: 'Fatuma Ali\'s VIP membership payment of KES 8,000 failed.', timestamp: '1 hour ago', read: false },
+        { id: 'N03', title: 'Class Almost Full', description: 'Zumba Party at FitSync Meru is almost full (28/30).', timestamp: '3 hours ago', read: true },
+        { id: 'N04', title: 'New Member Sign-up', description: 'Naliaka Wanjala has signed up for the Basic plan at FitSync Mombasa.', timestamp: 'Yesterday', read: true },
+    ],
+    instructor: [
+        { id: 'NI01', title: 'New Client Assigned', description: 'Wanjiku Mwangi has been assigned to you.', timestamp: '2 hours ago', read: false },
+        { id: 'NI02', title: 'Class Canceled', description: 'Your "HIIT Blast" class at 9:00 AM has been canceled by an admin.', timestamp: '1 day ago', read: true },
+    ],
+    member: [
+        { id: 'NM01', title: 'Booking Confirmed', description: 'Your spot in "Morning Yoga" is confirmed for tomorrow.', timestamp: '10 minutes ago', read: false },
+        { id: 'NM02', title: 'Payment Successful', description: 'Your monthly membership fee has been paid.', timestamp: '2 days ago', read: true },
+    ],
+    reception: [
+        { id: 'NR01', title: 'Peak Hours Alert', description: 'The gym is currently experiencing high traffic.', timestamp: 'Just now', read: false },
+        { id: 'NR02', title: 'System Update', description: 'The POS system will undergo maintenance tonight at 11 PM.', timestamp: '4 hours ago', read: true },
+    ],
+};
+
 
 export const walkInServices: WalkInService[] = [
   { id: 'walkin-day-pass', name: 'Day Pass', price: 500, color: 'rgba(59, 130, 246, 0.8)', icon: 'Ticket', category: 'Passes & Access' },
@@ -270,10 +285,12 @@ export const walkInServices: WalkInService[] = [
 ];
 
 export const inventory: InventoryItem[] = [
-    { id: 'INV001', name: '5kg Dumbbell Pair', category: 'Equipment', subCategory: 'Weights', quantity: 20, price: 2500 },
-    { id: 'INV002', name: 'Yoga Mat', category: 'Equipment', subCategory: 'Accessories', quantity: 50, price: 1500 },
-    { id: 'INV003', name: 'Treadmill', category: 'Equipment', subCategory: 'Cardio Machines', quantity: 5, price: 150000 },
-    { id: 'INV004', name: 'Protein Powder (1kg)', category: 'Supplements', subCategory: 'Protein', quantity: 30, price: 4000 },
-    { id: 'INV005', name: 'Gym Towel', category: 'Apparel', subCategory: 'Accessories', quantity: 100, price: 500 },
-    { id: 'INV006', name: 'Resistance Bands Set', category: 'Equipment', subCategory: 'Accessories', quantity: 40, price: 2000 },
+    { id: 'INV001', name: '5kg Dumbbell Pair', category: 'Equipment', subCategory: 'Weights', quantity: 20, price: 2500, showInPOS: false },
+    { id: 'INV002', name: 'Yoga Mat', category: 'Equipment', subCategory: 'Accessories', quantity: 50, price: 1500, showInPOS: true },
+    { id: 'INV003', name: 'Treadmill', category: 'Equipment', subCategory: 'Cardio Machines', quantity: 5, price: 150000, showInPOS: false },
+    { id: 'INV004', name: 'Protein Powder (1kg)', category: 'Supplements', subCategory: 'Protein', quantity: 30, price: 4000, showInPOS: true },
+    { id: 'INV005', name: 'Gym Towel', category: 'Apparel', subCategory: 'Accessories', quantity: 100, price: 500, showInPOS: true },
+    { id: 'INV006', name: 'Resistance Bands Set', category: 'Equipment', subCategory: 'Accessories', quantity: 40, price: 2000, showInPOS: false },
 ];
+
+    

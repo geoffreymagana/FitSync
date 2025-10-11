@@ -39,7 +39,7 @@ export default function InstructorLoginPage() {
             <Input
               id="email"
               type="email"
-              placeholder="instructor@example.com"
+              placeholder="instructor@fitsync.com"
               required
             />
           </div>

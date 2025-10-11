@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -38,7 +39,7 @@ export default function ReceptionLoginPage() {
             <Input
               id="email"
               type="email"
-              placeholder="reception@example.com"
+              placeholder="reception@fitsync.com"
               required
             />
           </div>

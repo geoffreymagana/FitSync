@@ -56,8 +56,9 @@ export type Payment = {
 export type Activity = {
   id: string;
   description: string;
-  timestamp: string;
+  timestamp: string; // ISO 8601 date string
   member: {
+    id: string;
     name: string;
     avatarUrl: string;
   }
@@ -116,6 +117,7 @@ export type InventoryItem = {
     subCategory: string;
     quantity: number;
     price: number;
+    showInPOS?: boolean;
 };
 
 export type TrainerSpecialization = {
@@ -127,3 +129,5 @@ export type BlockedDate = {
   date: string;
   reason: string;
 };
+
+    

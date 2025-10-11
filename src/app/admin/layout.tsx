@@ -45,7 +45,7 @@ export default function AdminLayout({
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80" align="end">
-                <Notifications />
+                <Notifications role="admin" />
               </PopoverContent>
             </Popover>
           </header>

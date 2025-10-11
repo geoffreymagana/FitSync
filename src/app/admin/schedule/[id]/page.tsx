@@ -15,6 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
+const LOCAL_STORAGE_KEY = 'fitsync_all_classes';
+
+
 const ClassForm = ({ 
     classData,
     trainers, 
@@ -129,23 +132,21 @@ export default function ClassDetailsPage() {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    // In a real app, this would be a fetch call.
-    // For now, we use the initial data. A better approach for this mock app
-    // would be to use a shared state/context.
-    const foundClass = classes.find(i => i.id === classId);
-    if (!foundClass) {
-        // A simple way to get updated data for this prototype.
-        // This is not a good practice for real applications.
-        const allKnownClasses = initialClasses;
-        const foundAgain = allKnownClasses.find(i => i.id === classId);
-        if (foundAgain) {
-            setCls(foundAgain);
-            setClasses(allKnownClasses);
+    let allKnownClasses = initialClasses;
+    if (typeof window !== 'undefined') {
+        const storedClasses = window.localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (storedClasses) {
+            try {
+                allKnownClasses = JSON.parse(storedClasses);
+            } catch (e) {
+                console.error("Failed to parse classes from local storage", e);
+            }
         }
-    } else {
-        setCls(foundClass);
     }
-  }, [classId, classes]);
+    const foundClass = allKnownClasses.find(i => i.id === classId);
+    setCls(foundClass);
+    setClasses(allKnownClasses);
+  }, [classId]);
 
   if (!cls) {
     return null; 
@@ -168,14 +169,23 @@ export default function ClassDetailsPage() {
       duration: Number(formData.get("duration")),
     };
 
-    setClasses(classes.map(c => c.id === cls.id ? updatedClassData : c));
+    const updatedClasses = classes.map(c => c.id === cls.id ? updatedClassData : c);
+    setClasses(updatedClasses);
+    if(typeof window !== 'undefined') {
+      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedClasses));
+    }
+    setCls(updatedClassData); // Update the state for the current page
     setIsEditing(false);
   };
 
   const handleDeleteClass = () => {
     if(!cls) return;
 
-    setClasses(classes.filter(c => c.id !== cls.id));
+    const updatedClasses = classes.filter(c => c.id !== cls.id);
+    setClasses(updatedClasses);
+    if(typeof window !== 'undefined') {
+      window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedClasses));
+    }
     router.push("/admin/schedule");
   }
 
@@ -210,7 +220,7 @@ export default function ClassDetailsPage() {
                               <Save className="mr-2 h-4 w-4" />
                               Save Changes
                           </Button>
-                          <Button variant="outline" onClick={() => setIsEditing(false)}>
+                          <Button variant="outline" type="button" onClick={() => setIsEditing(false)}>
                               Cancel
                           </Button>
                       </>
