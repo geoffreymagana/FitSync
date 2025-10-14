@@ -1,7 +1,7 @@
 
 <div align="center">
   <br />
-    <img src="https://raw.githubusercontent.com/bunibox/assets/main/images/icons/icon-192x192.png.png" alt="FitSync Logo" width="100" />
+    <img src="public/icons/icon-192x192.png.png" alt="FitSync Logo" width="100" />
   <h1 align="center">FitSync - Gym Management System</h1>
 </div>
 
