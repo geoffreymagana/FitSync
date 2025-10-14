@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PageHeader } from "@/components/page-header"
@@ -8,10 +9,16 @@ import { LocationSwitcher } from "@/components/location-switcher"
 import { useState } from "react"
 import { locations } from "@/lib/data"
 import { Button } from "@/components/ui/button"
-import { Download } from "lucide-react"
+import { Download, ArrowRight } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ClassOccupancyChart } from "@/components/analytics/class-occupancy-chart"
 import { PeakHoursChart } from "@/components/analytics/peak-hours-chart"
+import { RevenueBreakdownChart } from "@/components/analytics/revenue-breakdown-chart"
+import { ExpenseBreakdownChart } from "@/components/analytics/expense-breakdown-chart"
+import Link from "next/link"
+import { RecentTransactions } from "@/components/admin/recent-transactions"
+import { CheckInHistoryChart } from "@/components/analytics/check-in-history-chart"
+
 
 export default function AnalyticsPage() {
     const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
@@ -83,7 +90,59 @@ export default function AnalyticsPage() {
                         <PeakHoursChart locationId={selectedLocation} />
                     </CardContent>
                 </Card>
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Revenue Breakdown</CardTitle>
+                        <CardDescription>
+                            See where your income is coming from.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <RevenueBreakdownChart locationId={selectedLocation} />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Expense Breakdown</CardTitle>
+                        <CardDescription>
+                            Understand your operational costs.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ExpenseBreakdownChart locationId={selectedLocation} />
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Check-in History</CardTitle>
+                        <CardDescription>
+                            Daily member check-ins for the last 7 days.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <CheckInHistoryChart locationId={selectedLocation} />
+                    </CardContent>
+                </Card>
             </div>
+             <Card>
+                <CardHeader className="flex flex-row items-center">
+                    <div className="grid gap-2">
+                        <CardTitle>Recent Transactions</CardTitle>
+                        <CardDescription>
+                            The latest membership payments and walk-in sales.
+                        </CardDescription>
+                    </div>
+                    <Button asChild size="sm" className="ml-auto gap-1">
+                        <Link href="/admin/payments">
+                        View All
+                        <ArrowRight className="h-4 w-4" />
+                        </Link>
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <RecentTransactions locationId={selectedLocation} />
+                </CardContent>
+            </Card>
         </div>
     )
 }

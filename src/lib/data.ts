@@ -1,5 +1,6 @@
 
-import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate } from './types';
+
+import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate, FinancialBreakdown, CheckInHistory } from './types';
 
 export const locations: Location[] = [
   { id: 'L01', name: 'FitSync Meru', type: 'Main', address: '123 Meru-Nanyuki Rd, Meru', members: 450 },
@@ -90,6 +91,10 @@ export const recentActivities: Activity[] = [
     { id: 'A01', description: 'Checked in successfully.', timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(), member: { id: 'M004', name: 'Kiprono Bett', avatarUrl: 'https://picsum.photos/seed/member4/100/100' } },
     { id: 'A02', description: 'Booked a spot in Morning Yoga.', timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(), member: { id: 'M001', name: 'Wanjiku Mwangi', avatarUrl: 'https://picsum.photos/seed/member1/100/100' } },
     { id: 'A03', description: 'Membership renewed (Premium).', timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString(), member: { id: 'M002', name: 'Omondi Okoth', avatarUrl: 'https://picsum.photos/seed/member2/100/100' } },
+    { id: 'A04', description: 'Checked in successfully.', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), member: { id: 'M001', name: 'Wanjiku Mwangi', avatarUrl: 'https://picsum.photos/seed/member1/100/100' } },
+    { id: 'A05', description: 'Checked in successfully.', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(), member: { id: 'M001', name: 'Wanjiku Mwangi', avatarUrl: 'https://picsum.photos/seed/member1/100/100' } },
+    { id: 'A06', description: 'Checked in successfully.', timestamp: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(), member: { id: 'M001', name: 'Wanjiku Mwangi', avatarUrl: 'https://picsum.photos/seed/member1/100/100' } },
+    { id: 'A07', description: 'Checked in successfully.', timestamp: new Date(new Date().setDate(new Date().getDate() - 3)).toISOString(), member: { id: 'M001', name: 'Wanjiku Mwangi', avatarUrl: 'https://picsum.photos/seed/member1/100/100' } },
 ];
 
 export const payments: Payment[] = [
@@ -214,6 +219,52 @@ export const peakHoursData: Record<string, { hour: string, members: number }[]> 
   ],
 };
 
+export const revenueBreakdownData: Record<string, FinancialBreakdown[]> = {
+  'L01': [
+    { name: 'Membership Fees', value: 850000 },
+    { name: 'Personal Training', value: 250000 },
+    { name: 'Walk-in Services', value: 150000 },
+    { name: 'Product Sales', value: 100000 },
+  ],
+  'L02': [
+    { name: 'Membership Fees', value: 950000 },
+    { name: 'Personal Training', value: 350000 },
+    { name: 'Walk-in Services', value: 180000 },
+    { name: 'Product Sales', value: 120000 },
+  ],
+  'L03': [
+    { name: 'Membership Fees', value: 650000 },
+    { name: 'Personal Training', value: 150000 },
+    { name: 'Walk-in Services', value: 100000 },
+    { name: 'Product Sales', value: 50000 },
+  ],
+};
+
+export const expenseBreakdownData: Record<string, FinancialBreakdown[]> = {
+  'L01': [
+    { name: 'Salaries', value: 400000 },
+    { name: 'Rent', value: 300000 },
+    { name: 'Utilities', value: 100000 },
+    { name: 'Equipment', value: 150000 },
+    { name: 'Marketing', value: 50000 },
+  ],
+  'L02': [
+    { name: 'Salaries', value: 500000 },
+    { name: 'Rent', value: 400000 },
+    { name: 'Utilities', value: 120000 },
+    { name: 'Equipment', value: 200000 },
+    { name: 'Marketing', value: 80000 },
+  ],
+  'L03': [
+    { name: 'Salaries', value: 300000 },
+    { name: 'Rent', value: 250000 },
+    { name: 'Utilities', value: 80000 },
+    { name: 'Equipment', value: 100000 },
+    { name: 'Marketing', value: 40000 },
+  ],
+};
+
+
 export const plans: Plan[] = [
   {
     id: 'plan-basic',
@@ -293,4 +344,33 @@ export const inventory: InventoryItem[] = [
     { id: 'INV006', name: 'Resistance Bands Set', category: 'Equipment', subCategory: 'Accessories', quantity: 40, price: 2000, showInPOS: false },
 ];
 
+export const checkInHistoryData: Record<string, CheckInHistory[]> = {
+  'L01': [
+    { date: '2023-06-01', checkIns: 120 },
+    { date: '2023-06-02', checkIns: 135 },
+    { date: '2023-06-03', checkIns: 150 },
+    { date: '2023-06-04', checkIns: 140 },
+    { date: '2023-06-05', checkIns: 160 },
+    { date: '2023-06-06', checkIns: 175 },
+    { date: '2023-06-07', checkIns: 165 },
+  ],
+  'L02': [
+    { date: '2023-06-01', checkIns: 110 },
+    { date: '2023-06-02', checkIns: 125 },
+    { date: '2023-06-03', checkIns: 140 },
+    { date: '2023-06-04', checkIns: 130 },
+    { date: '2023-06-05', checkIns: 150 },
+    { date: '2023-06-06', checkIns: 165 },
+    { date: '2023-06-07', checkIns: 155 },
+  ],
+  'L03': [
+    { date: '2023-06-01', checkIns: 80 },
+    { date: '2023-06-02', checkIns: 95 },
+    { date: '2023-06-03', checkIns: 110 },
+    { date: '2023-06-04', checkIns: 100 },
+    { date: '2023-06-05', checkIns: 120 },
+    { date: '2023-06-06', checkIns: 135 },
+    { date: '2023-06-07', checkIns: 125 },
+  ],
+};
     

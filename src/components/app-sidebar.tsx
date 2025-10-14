@@ -44,6 +44,7 @@ const adminNavItems: NavItem[] = [
   { href: "/admin/plans", icon: Award, label: "Plans" },
   { href: "/admin/services", icon: ShoppingBag, label: "Services" },
   { href: "/admin/inventory", icon: Warehouse, label: "Inventory" },
+  { href: "/admin/transactions", icon: Receipt, label: "Walk-in Sales" },
   { href: "/admin/accounts", icon: UserCog, label: "Accounts" },
   { href: "/admin/analytics", icon: PieChart, label: "Analytics" },
   { href: "/admin/locations", icon: MapPin, label: "Locations" },
@@ -102,13 +103,13 @@ export function AppSidebar({ role }: AppSidebarProps) {
         <Logo className="w-8 h-8 text-primary" />
         <span className="font-headline text-lg font-semibold">FitSync</span>
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto" data-sidebar-content>
         <ul className="flex w-full min-w-0 flex-col gap-1 px-3">
           {navItems.map((item) => (
             <li key={item.href} className="group/menu-item relative">
               <Link href={item.href}
                 className={`flex w-full items-center gap-3 overflow-hidden rounded-md p-3 text-left text-sm outline-none ring-sidebar-ring transition-all hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground
-                ${pathname === item.href ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-medium' : ''}`}
+                ${pathname.startsWith(item.href) && (item.href !== '/admin' || pathname === '/admin') ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground font-medium' : ''}`}
               >
                   <item.icon className="h-5 w-5 shrink-0" />
                   <span className="truncate">{item.label}</span>
@@ -155,5 +156,3 @@ export function AppSidebar({ role }: AppSidebarProps) {
     </aside>
   );
 }
-
-    

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { walkInServices as initialWalkInServices, inventory } from "@/lib/data";
 import { WalkInService, OrderItem, Transaction } from "@/lib/types";
 import { useState, useMemo, useEffect, useContext } from "react";
-import { CreditCard, Smartphone, Plus, Minus, X, CheckCircle, Mail, Banknote, Shirt } from "lucide-react";
+import { CreditCard, Smartphone, Plus, Minus, X, CheckCircle, Mail, Banknote, Shirt, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -52,6 +52,7 @@ export default function WalkInPage() {
     const { toast } = useToast();
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [lastCompletedTransaction, setLastCompletedTransaction] = useState<Transaction | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const posItems = useMemo(() => {
         const inventoryForPOS = inventory
@@ -189,7 +190,13 @@ export default function WalkInPage() {
     };
     
     const serviceCategories = useMemo(() => {
-        return posItems.reduce((acc, service) => {
+        const filteredItems = searchQuery
+          ? posItems.filter(item =>
+              item.name.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+          : posItems;
+
+        return filteredItems.reduce((acc, service) => {
             const category = service.category || 'Uncategorized';
             if (!acc[category]) {
                 acc[category] = [];
@@ -197,7 +204,7 @@ export default function WalkInPage() {
             acc[category].push(service);
             return acc;
         }, {} as Record<string, WalkInService[]>);
-    }, [posItems]);
+    }, [posItems, searchQuery]);
 
     return (
         <div className="h-screen bg-muted/20 lg:h-[calc(100vh-64px)]">
@@ -239,6 +246,15 @@ export default function WalkInPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 h-full">
                 <div className="lg:col-span-2 p-4 md:p-6 overflow-y-auto">
+                    <div className="relative mb-6">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search services and products..."
+                            className="pl-10 h-11"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
                     {Object.entries(serviceCategories).map(([category, services]) => (
                         <div key={category} className="mb-8">
                             <h2 className="text-xl font-semibold mb-4">{category}</h2>
@@ -267,6 +283,11 @@ export default function WalkInPage() {
                             </div>
                         </div>
                     ))}
+                    {Object.keys(serviceCategories).length === 0 && (
+                        <div className="flex items-center justify-center h-64 text-muted-foreground">
+                            No items found for "{searchQuery}"
+                        </div>
+                    )}
                 </div>
 
                 <div className="lg:col-span-1 bg-background border-l h-full flex flex-col">

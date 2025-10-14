@@ -1,11 +1,15 @@
+
 "use client";
 
 import { PageHeader } from "@/components/page-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dumbbell, Users, Activity, BarChart3 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Dumbbell, Users, Activity, BarChart3, ArrowRight } from "lucide-react";
 import { LocationSwitcher } from "@/components/location-switcher";
 import { useState, useMemo } from "react";
 import { locations, members, trainers, payments } from "@/lib/data";
+import { RecentTransactions } from "@/components/admin/recent-transactions";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function AdminDashboardPage() {
     const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
@@ -78,6 +82,25 @@ export default function AdminDashboardPage() {
                     </CardContent>
                 </Card>
             </div>
+             <Card>
+                <CardHeader className="flex flex-row items-center">
+                    <div className="grid gap-2">
+                        <CardTitle>Recent Transactions</CardTitle>
+                        <CardDescription>
+                            The latest membership payments and walk-in sales.
+                        </CardDescription>
+                    </div>
+                    <Button asChild size="sm" className="ml-auto gap-1">
+                        <Link href="/admin/payments">
+                        View All
+                        <ArrowRight className="h-4 w-4" />
+                        </Link>
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <RecentTransactions locationId={selectedLocation} />
+                </CardContent>
+            </Card>
         </div>
     );
 }
