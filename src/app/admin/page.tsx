@@ -11,9 +11,6 @@ import { locations, members, trainers, payments } from "@/lib/data";
 import { RecentTransactions } from "@/components/admin/recent-transactions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { RecentTransactions } from "@/components/admin/recent-transactions";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export default function AdminDashboardPage() {
     const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
