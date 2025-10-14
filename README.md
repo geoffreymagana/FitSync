@@ -19,6 +19,16 @@ The application is built as a multi-dashboard system, providing tailored experie
 
 ---
 
+## Recent Updates (v1.1.0)
+
+-   **feat(analytics):** Added "Revenue Breakdown" and "Expense Breakdown" charts to the admin analytics dashboard for deeper financial insights.
+-   **feat(dashboard):** Integrated a "Recent Transactions" table on the main admin dashboard, showing a unified view of both membership payments and walk-in sales.
+-   **feat(pos):** Implemented a search bar in the reception Point-of-Sale (POS) system for faster product and service lookup.
+-   **feat(check-in):** Added check-in history tracking for members on their profile and check-in pages. A status badge now indicates if a member is currently checked-in.
+-   **feat(inventory):** Enabled inline editing and deletion of items directly from the inventory details page.
+-   **fix(routing):** Corrected a routing bug where reception staff were incorrectly redirected to an admin page. They now have a dedicated read-only view.
+-   **style(ui):** Implemented a custom, thin, branded scrollbar across the admin dashboard for a more polished and cohesive look.
+
 ## Key Features
 
 -   **Multi-Role Dashboards**: Separate, feature-rich dashboards for Admins, Members, Receptionists, and Instructors.
@@ -84,8 +94,6 @@ A dedicated space for trainers to manage their classes and clients.
 
 ---
 
----
-
 ## Tech Stack
 
 -   **Framework**: [Next.js](https://nextjs.org/) (App Router)
@@ -110,8 +118,8 @@ A dedicated space for trainers to manage their classes and clients.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/geoffreymagana/FitSync.git
-    cd FitSync
+    git clone <repository-url>
+    cd fitsync-project
     ```
 
 2.  **Install dependencies:**
@@ -276,3 +284,4 @@ The project follows the standard Next.js App Router structure.
 -   **/public/**: Static assets.
 -   **tailwind.config.ts**: Configuration for Tailwind CSS.
 -   **next.config.ts**: Configuration for Next.js.
+```

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PageHeader } from "@/components/page-header";
@@ -122,7 +123,7 @@ export default function PlansPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="price">Price (KES per month)</Label>
-                <Input id="price" name="price" type="number" max="150000" placeholder="e.g., 7500" required />
+                <Input id="price" name="price" type="number" max="15000" placeholder="e.g., 7500" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="features">Features (one per line)</Label>
@@ -154,7 +155,7 @@ export default function PlansPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-price">Price (KES per month)</Label>
-                <Input id="edit-price" name="price" type="number" max="150000" defaultValue={selectedPlan?.price} required />
+                <Input id="edit-price" name="price" type="number" max="15000" defaultValue={selectedPlan?.price} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-features">Features (one per line)</Label>

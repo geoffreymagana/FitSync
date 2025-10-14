@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { staff as initialStaff, Staff } from "@/lib/data";
+import { staff as initialStaff, Staff, locations } from "@/lib/data";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LocationSwitcher } from "@/components/location-switcher";
+import Link from "next/link";
 
 export default function StaffPage() {
   const [staff, setStaff] = useState<Staff[]>(initialStaff);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState(locations[0].id);
+  
+  const filteredStaff = staff.filter(member => member.locationId === selectedLocation);
 
   const openEditDialog = (staffMember: Staff) => {
     setSelectedStaff(staffMember);
@@ -37,7 +42,8 @@ export default function StaffPage() {
       email: formData.get("email") as string,
       role: formData.get("role") as 'Admin' | 'Reception' | 'Trainer',
       status: 'Active',
-      avatarUrl: 'https://picsum.photos/seed/newStaff/100/100'
+      avatarUrl: 'https://picsum.photos/seed/newStaff/100/100',
+      locationId: formData.get("locationId") as string,
     };
     setStaff([...staff, newStaff]);
     setIsAddDialogOpen(false);
@@ -56,6 +62,7 @@ export default function StaffPage() {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       role: formData.get("role") as 'Admin' | 'Reception' | 'Trainer',
+      locationId: formData.get("locationId") as string,
     };
 
     setStaff(staff.map(s => s.id === selectedStaff.id ? updatedStaff : s));
@@ -66,10 +73,13 @@ export default function StaffPage() {
   return (
     <div className="space-y-8">
       <PageHeader title="Staff Management">
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <PlusCircle className="mr-2" />
-          Add Staff
-        </Button>
+        <div className="flex items-center gap-2">
+            <LocationSwitcher selectedLocation={selectedLocation} onLocationChange={setSelectedLocation} />
+            <Button onClick={() => setIsAddDialogOpen(true)}>
+            <PlusCircle className="mr-2" />
+            Add Staff
+            </Button>
+        </div>
       </PageHeader>
 
       <Card>
@@ -87,10 +97,10 @@ export default function StaffPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {staff.map(staffMember => (
+                {filteredStaff.map(staffMember => (
                   <TableRow key={staffMember.id}>
                     <TableCell>
-                      <div className="flex items-center space-x-3">
+                      <Link href={`/admin/staff/${staffMember.id}`} className="flex items-center space-x-3 hover:underline">
                         <Avatar className="hidden sm:flex">
                           <AvatarImage src={staffMember.avatarUrl} alt={staffMember.name} data-ai-hint="person" />
                           <AvatarFallback>{staffMember.name.charAt(0)}</AvatarFallback>
@@ -99,7 +109,7 @@ export default function StaffPage() {
                           <div className="font-medium">{staffMember.name}</div>
                           <div className="text-sm text-muted-foreground">{staffMember.email}</div>
                         </div>
-                      </div>
+                      </Link>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">{staffMember.role}</TableCell>
                     <TableCell>
@@ -153,6 +163,19 @@ export default function StaffPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" name="email" type="email" placeholder="staff@fitsync.com" required />
               </div>
+               <div className="space-y-2">
+                <Label htmlFor="locationId">Location</Label>
+                 <Select name="locationId" defaultValue={selectedLocation} required>
+                  <SelectTrigger id="locationId">
+                    <SelectValue placeholder="Select a location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations.map(loc => (
+                      <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>
                  <Select name="role" required>
@@ -193,6 +216,19 @@ export default function StaffPage() {
               <div className="space-y-2">
                 <Label htmlFor="edit-email">Email</Label>
                 <Input id="edit-email" name="email" type="email" defaultValue={selectedStaff?.email} required />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="edit-locationId">Location</Label>
+                 <Select name="locationId" defaultValue={selectedStaff?.locationId} required>
+                  <SelectTrigger id="edit-locationId">
+                    <SelectValue placeholder="Select a location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations.map(loc => (
+                      <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-role">Role</Label>

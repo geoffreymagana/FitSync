@@ -9,20 +9,20 @@ export const locations: Location[] = [
 ];
 
 export const trainerSpecializations: TrainerSpecialization[] = [
-    { value: 'weightlifting', label: 'Weightlifting' },
-    { value: 'crossfit', label: 'CrossFit' },
-    { value: 'yoga', label: 'Yoga' },
-    { value: 'pilates', label: 'Pilates' },
-    { value: 'zumba', label: 'Zumba' },
     { value: 'cardio', label: 'Cardio & Endurance' },
-    { value: 'strength', label: 'Strength & Conditioning' },
-    { value: 'nutrition', label: 'Nutrition & Diet' },
-    { value: 'rehab', label: 'Rehabilitation' },
-    { value: 'martial_arts', label: 'Martial Arts' },
+    { value: 'crossfit', label: 'CrossFit' },
     { value: 'dance', label: 'Dance Fitness' },
-    { value: 'spin', label: 'Spin & Cycling' },
     { value: 'hiit', label: 'HIIT' },
-];
+    { value: 'martial_arts', label: 'Martial Arts' },
+    { value: 'nutrition', label: 'Nutrition & Diet' },
+    { value: 'pilates', label: 'Pilates' },
+    { value: 'rehab', label: 'Rehabilitation' },
+    { value: 'spin', label: 'Spin & Cycling' },
+    { value: 'strength', label: 'Strength & Conditioning' },
+    { value: 'weightlifting', label: 'Weightlifting' },
+    { value: 'yoga', label: 'Yoga' },
+    { value: 'zumba', label: 'Zumba' },
+].sort((a, b) => a.label.localeCompare(b.label));
 
 export const members: Member[] = [
   // Meru
@@ -54,10 +54,20 @@ export const trainers: Trainer[] = [
 ];
 
 export const staff: Staff[] = [
-  { id: 'S01', name: 'Admin User', email: 'admin@fitsync.com', avatarUrl: 'https://picsum.photos/seed/staff1/100/100', role: 'Admin', status: 'Active' },
-  { id: 'S02', name: 'Juma Kalama', email: 'juma.k@fitsync.com', avatarUrl: 'https://picsum.photos/seed/trainer1/100/100', role: 'Trainer', status: 'Active' },
-  { id: 'S03', name: 'Reception User', email: 'reception@fitsync.com', avatarUrl: 'https://picsum.photos/seed/staff2/100/100', role: 'Reception', status: 'Active' },
-  { id: 'S04', name: 'Chebet Koech', email: 'chebet.k@fitsync.com', avatarUrl: 'https://picsum.photos/seed/staff3/100/100', role: 'Trainer', status: 'Inactive' },
+  // Meru (L01)
+  { id: 'S01', name: 'Maina Kamau', email: 'admin@fitsync.com', phone: '0712345678', joinDate: '2022-01-01', avatarUrl: 'https://picsum.photos/seed/staff1/100/100', role: 'Admin', status: 'Active', locationId: 'L01' },
+  { id: 'S02', name: 'Juma Kalama', email: 'juma.k@fitsync.com', phone: '0722345678', joinDate: '2022-05-10', avatarUrl: 'https://picsum.photos/seed/trainer1/100/100', role: 'Trainer', status: 'Active', locationId: 'L01' },
+  { id: 'S03', name: 'Amina Sharif', email: 'reception@fitsync.com', phone: '0732345678', joinDate: '2023-02-15', avatarUrl: 'https://picsum.photos/seed/staff2/100/100', role: 'Reception', status: 'Active', locationId: 'L01' },
+  { id: 'S07', name: 'Achieng Otieno', email: 'achieng.o@fitsync.com', phone: '0742345678', joinDate: '2022-08-20', avatarUrl: 'https://picsum.photos/seed/trainer4/100/100', role: 'Trainer', status: 'Active', locationId: 'L01' },
+  
+  // Nairobi (L02)
+  { id: 'S04', name: 'Chebet Koech', email: 'chebet.k@fitsync.com', phone: '0752345678', joinDate: '2023-01-05', avatarUrl: 'https://picsum.photos/seed/staff3/100/100', role: 'Trainer', status: 'Inactive', locationId: 'L02' },
+  { id: 'S05', name: 'Wambui Kimani', email: 'wambui.k@fitsync.com', phone: '0762345678', joinDate: '2021-11-11', avatarUrl: 'https://picsum.photos/seed/trainer2/100/100', role: 'Trainer', status: 'Active', locationId: 'L02' },
+  { id: 'S06', name: 'Nairobi Reception', email: 'reception.nbi@fitsync.com', phone: '0772345678', joinDate: '2021-10-01', avatarUrl: 'https://picsum.photos/seed/staff4/100/100', role: 'Reception', status: 'Active', locationId: 'L02' },
+  
+  // Mombasa (L03)
+  { id: 'S08', name: 'Baraka Mwangi', email: 'baraka.m@fitsync.com', phone: '0782345678', joinDate: '2022-03-18', avatarUrl: 'https://picsum.photos/seed/trainer3/100/100', role: 'Trainer', status: 'Active', locationId: 'L03' },
+  { id: 'S09', name: 'Suleiman Said', email: 'reception.msa@fitsync.com', phone: '0792345678', joinDate: '2023-04-01', avatarUrl: 'https://picsum.photos/seed/staff5/100/100', role: 'Reception', status: 'Active', locationId: 'L03' },
 ];
 
 export const upcomingClasses: Omit<Class, 'date' | 'duration' | 'locationId'>[] = [
@@ -67,18 +77,18 @@ export const upcomingClasses: Omit<Class, 'date' | 'duration' | 'locationId'>[] 
     { id: 'C104', name: 'Evening Pilates', trainer: 'Wambui Kimani', time: '6:00 PM', spots: 20, booked: 18 },
 ];
 
-export const classes: Class[] = [
+export let classes: Class[] = [
   // Meru
-  { id: 'C102', locationId: 'L01', name: 'HIIT Blast', trainer: 'Juma Kalama', date: '2023-05-25', time: '9:00 AM', duration: 45, spots: 25, booked: 25 },
-  { id: 'C201', locationId: 'L01', name: 'Zumba Party', trainer: 'Achieng Otieno', date: '2023-05-26', time: '5:00 PM', duration: 50, spots: 30, booked: 28 },
+  { id: 'C102', locationId: 'L01', name: 'HIIT Blast', trainer: 'Juma Kalama', date: '2023-05-25', time: '09:00', duration: 45, spots: 25, booked: 25 },
+  { id: 'C201', locationId: 'L01', name: 'Zumba Party', trainer: 'Achieng Otieno', date: '2023-05-26', time: '17:00', duration: 50, spots: 30, booked: 28 },
 
   // Nairobi
-  { id: 'C101', locationId: 'L02', name: 'Morning Yoga', trainer: 'Wambui Kimani', date: '2023-05-25', time: '8:00 AM', duration: 60, spots: 20, booked: 15 },
-  { id: 'C104', locationId: 'L02', name: 'Evening Pilates', trainer: 'Wambui Kimani', date: '2023-05-25', time: '6:00 PM', duration: 60, spots: 20, booked: 18 },
+  { id: 'C101', locationId: 'L02', name: 'Morning Yoga', trainer: 'Wambui Kimani', date: '2023-05-25', time: '08:00', duration: 60, spots: 20, booked: 15 },
+  { id: 'C104', locationId: 'L02', name: 'Evening Pilates', trainer: 'Wambui Kimani', date: '2023-05-25', time: '18:00', duration: 60, spots: 20, booked: 18 },
 
   // Mombasa
-  { id: 'C103', locationId: 'L03', name: 'Powerlifting 101', trainer: 'Baraka Mwangi', date: '2023-05-25', time: '10:30 AM', duration: 90, spots: 15, booked: 10 },
-  { id: 'C202', locationId: 'L03', name: 'Spin Cycle', trainer: 'Abdi Yusuf', date: '2023-05-26', time: '6:00 PM', duration: 45, spots: 20, booked: 12 },
+  { id: 'C103', locationId: 'L03', name: 'Powerlifting 101', trainer: 'Baraka Mwangi', date: '2023-05-25', time: '10:30', duration: 90, spots: 15, booked: 10 },
+  { id: 'C202', locationId: 'L03', name: 'Spin Cycle', trainer: 'Abdi Yusuf', date: '2023-05-26', time: '18:00', duration: 45, spots: 20, booked: 12 },
 ];
 
 export const blockedDates: BlockedDate[] = [

@@ -296,7 +296,7 @@ export default function ServicesPage() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="price">Price (KES)</Label>
-                <Input id="price" name="price" type="number" max="150000" placeholder="800" defaultValue={service?.price} required />
+                <Input id="price" name="price" type="number" max="15000" placeholder="800" defaultValue={service?.price} required />
             </div>
         </div>
     )

@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { trainers as initialTrainers, locations, Trainer, trainerSpecializations } from "@/lib/data";
-import { MoreHorizontal, PlusCircle, Download } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Download, ChevronsUpDown, Check } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { LocationSwitcher } from "@/components/location-switcher";
@@ -16,6 +16,60 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+
+
+const SpecializationCombobox = ({ value, onValueChange }: { value: string, onValueChange: (value: string) => void }) => {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between"
+                >
+                    {value
+                        ? trainerSpecializations.find((spec) => spec.label.toLowerCase() === value.toLowerCase())?.label
+                        : "Select specialization..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                <Command>
+                    <CommandInput placeholder="Search specialization..." />
+                    <CommandList>
+                        <CommandEmpty>No specialization found.</CommandEmpty>
+                        <CommandGroup>
+                            {trainerSpecializations.map((spec) => (
+                                <CommandItem
+                                    key={spec.value}
+                                    value={spec.label}
+                                    onSelect={(currentValue) => {
+                                        onValueChange(currentValue === value ? "" : currentValue);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            value.toLowerCase() === spec.label.toLowerCase() ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {spec.label}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
+};
 
 
 export default function TrainersPage() {
@@ -25,12 +79,23 @@ export default function TrainersPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
 
+  // State for comboboxes
+  const [addSpecialization, setAddSpecialization] = useState("");
+  const [editSpecialization, setEditSpecialization] = useState("");
+
   const filteredTrainers = trainers.filter(trainer => trainer.locationId === selectedLocation);
 
   const openEditDialog = (trainer: Trainer) => {
     setSelectedTrainer(trainer);
+    setEditSpecialization(trainer.specialization);
     setIsEditDialogOpen(true);
   };
+  
+  const openAddDialog = () => {
+      setSelectedTrainer(null);
+      setAddSpecialization("");
+      setIsAddDialogOpen(true);
+  }
 
   const handleAddTrainer = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,7 +104,7 @@ export default function TrainersPage() {
     const newTrainer: Trainer = {
       id: `T${trainers.length + 1}`,
       name: formData.get("name") as string,
-      specialization: formData.get("specialization") as string,
+      specialization: trainerSpecializations.find(s => s.label.toLowerCase() === addSpecialization.toLowerCase())?.label || "",
       locationId: formData.get("locationId") as string,
       status: 'On-Duty',
       clients: 0,
@@ -60,7 +125,7 @@ export default function TrainersPage() {
     const updatedTrainer = {
       ...selectedTrainer,
       name: formData.get("name") as string,
-      specialization: formData.get("specialization") as string,
+      specialization: trainerSpecializations.find(s => s.label.toLowerCase() === editSpecialization.toLowerCase())?.label || "",
       locationId: formData.get("locationId") as string,
     };
 
@@ -75,7 +140,7 @@ export default function TrainersPage() {
       <PageHeader title="Trainers">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <LocationSwitcher selectedLocation={selectedLocation} onLocationChange={setSelectedLocation} />
-          <Button onClick={() => setIsAddDialogOpen(true)} className="w-full sm:w-auto">
+          <Button onClick={openAddDialog} className="w-full sm:w-auto">
             <PlusCircle className="mr-2" />
             Add Trainer
           </Button>
@@ -161,17 +226,8 @@ export default function TrainersPage() {
                 <Input id="name" name="name" placeholder="John Smith" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="specialization">Specialization</Label>
-                <Select name="specialization" required>
-                    <SelectTrigger id="specialization">
-                        <SelectValue placeholder="Select a specialization" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {trainerSpecializations.map(spec => (
-                            <SelectItem key={spec.value} value={spec.label}>{spec.label}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                <Label>Specialization</Label>
+                <SpecializationCombobox value={addSpecialization} onValueChange={setAddSpecialization} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="locationId">Location</Label>
@@ -211,17 +267,8 @@ export default function TrainersPage() {
                 <Input id="edit-name" name="name" defaultValue={selectedTrainer?.name} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-specialization">Specialization</Label>
-                 <Select name="specialization" defaultValue={selectedTrainer?.specialization} required>
-                    <SelectTrigger id="edit-specialization">
-                        <SelectValue placeholder="Select a specialization" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {trainerSpecializations.map(spec => (
-                            <SelectItem key={spec.value} value={spec.label}>{spec.label}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                <Label>Specialization</Label>
+                 <SpecializationCombobox value={editSpecialization} onValueChange={setEditSpecialization} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-locationId">Location</Label>

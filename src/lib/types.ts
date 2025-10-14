@@ -1,6 +1,5 @@
 
 
-
 export type Member = {
   id: string;
   locationId: string;
@@ -26,9 +25,12 @@ export type Staff = {
   id: string;
   name: string;
   email: string;
+  phone: string;
+  joinDate: string;
   avatarUrl: string;
   role: 'Admin' | 'Reception' | 'Trainer';
   status: 'Active' | 'Inactive';
+  locationId: string;
 };
 
 export type Class = {

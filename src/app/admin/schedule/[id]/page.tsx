@@ -28,27 +28,7 @@ const ClassForm = ({
     isEditing: boolean,
 }) => {
   if (!classData) return null;
-  const [minTime, setMinTime] = useState('');
-  const [date, setDate] = useState(classData.date);
   const today = new Date().toISOString().split('T')[0];
-
-  useEffect(() => {
-    const now = new Date();
-    if (date === today) {
-        const minHour = now.getHours() + 1;
-        if (minHour < 24) {
-            setMinTime(`${minHour.toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
-        } else {
-            setMinTime('23:59'); 
-        }
-    } else {
-        setMinTime('');
-    }
-  }, [date, today]);
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDate(e.target.value);
-  };
   
   if (!isEditing) {
       return (
@@ -100,17 +80,17 @@ const ClassForm = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="date">Date</Label>
-          <Input id="date" name="date" type="date" value={date} required min={today} onChange={handleDateChange} />
+          <Input id="date" name="date" type="date" defaultValue={classData.date} required min={today} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="time">Time</Label>
-          <Input id="time" name="time" type="time" defaultValue={classData.time} required min={minTime} />
+          <Input id="time" name="time" type="time" defaultValue={classData.time} required />
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="spots">Available Spots</Label>
-          <Input id="spots" name="spots" type="number" placeholder="25" defaultValue={classData.spots} required />
+          <Input id="spots" name="spots" type="number" placeholder="25" max="100" defaultValue={classData.spots} required />
         </div>
         <div className="space-y-2">
             <Label htmlFor="duration">Duration (minutes)</Label>
