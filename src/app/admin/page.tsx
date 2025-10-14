@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { PageHeader } from "@/components/page-header";
@@ -7,6 +8,9 @@ import { Dumbbell, Users, Activity, BarChart3, ArrowRight } from "lucide-react";
 import { LocationSwitcher } from "@/components/location-switcher";
 import { useState, useMemo } from "react";
 import { locations, members, trainers, payments } from "@/lib/data";
+import { RecentTransactions } from "@/components/admin/recent-transactions";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { RecentTransactions } from "@/components/admin/recent-transactions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

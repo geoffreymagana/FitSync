@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { PageHeader } from "@/components/page-header"
@@ -9,6 +10,7 @@ import { LocationSwitcher } from "@/components/location-switcher"
 import { useState } from "react"
 import { locations } from "@/lib/data"
 import { Button } from "@/components/ui/button"
+import { Download, ArrowRight } from "lucide-react"
 import { Download, ArrowRight } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ClassOccupancyChart } from "@/components/analytics/class-occupancy-chart"

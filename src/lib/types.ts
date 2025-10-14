@@ -1,5 +1,6 @@
 
 
+
 export type Member = {
   id: string;
   locationId: string;
