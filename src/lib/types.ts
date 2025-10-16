@@ -1,5 +1,14 @@
 
 
+export type Integration = {
+  id: string;
+  name: string;
+  description: string;
+  logo: string;
+  category: string;
+  status: 'Connected' | 'Not Connected';
+};
+
 export type Member = {
   id: string;
   locationId: string;
@@ -31,6 +40,7 @@ export type Staff = {
   role: 'Admin' | 'Reception' | 'Trainer';
   status: 'Active' | 'Inactive';
   locationId: string;
+  salary?: number;
 };
 
 export type Class = {
@@ -106,6 +116,10 @@ export type Transaction = {
     id: string;
     items: OrderItem[];
     total: number;
+    discount?: {
+      name: string;
+      amount: number;
+    };
     paymentMethod: 'M-Pesa' | 'Cash';
     customer: {
         phone: string;
@@ -144,3 +158,17 @@ export type CheckInHistory = {
   date: string;
   checkIns: number;
 }
+
+export type Discount = {
+    id: string;
+    name: string;
+    type: 'percentage' | 'fixed';
+    value: number;
+    appliesTo: 'all' | 'service';
+    serviceId?: string; // Only if appliesTo is 'service'
+    description: string;
+    status: 'Active' | 'Inactive';
+    startDate?: string;
+    endDate?: string;
+    locationId: string;
+};

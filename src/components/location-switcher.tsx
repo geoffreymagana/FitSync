@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -18,14 +19,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { locations } from "@/lib/data"
+import { locations as defaultLocations, Location } from "@/lib/data"
 
 type LocationSwitcherProps = {
   selectedLocation: string;
   onLocationChange: (locationId: string) => void;
+  locations?: Location[];
 };
 
-export function LocationSwitcher({ selectedLocation, onLocationChange }: LocationSwitcherProps) {
+export function LocationSwitcher({ 
+    selectedLocation, 
+    onLocationChange, 
+    locations = defaultLocations 
+}: LocationSwitcherProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -77,3 +83,5 @@ export function LocationSwitcher({ selectedLocation, onLocationChange }: Locatio
     </Popover>
   )
 }
+
+    

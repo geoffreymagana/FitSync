@@ -1,6 +1,9 @@
 
 
-import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate, FinancialBreakdown, CheckInHistory } from './types';
+
+
+
+import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate, FinancialBreakdown, CheckInHistory, Discount } from './types';
 
 export const locations: Location[] = [
   { id: 'L01', name: 'FitSync Meru', type: 'Main', address: '123 Meru-Nanyuki Rd, Meru', members: 450 },
@@ -55,19 +58,19 @@ export const trainers: Trainer[] = [
 
 export const staff: Staff[] = [
   // Meru (L01)
-  { id: 'S01', name: 'Maina Kamau', email: 'admin@fitsync.com', phone: '0712345678', joinDate: '2022-01-01', avatarUrl: 'https://picsum.photos/seed/staff1/100/100', role: 'Admin', status: 'Active', locationId: 'L01' },
-  { id: 'S02', name: 'Juma Kalama', email: 'juma.k@fitsync.com', phone: '0722345678', joinDate: '2022-05-10', avatarUrl: 'https://picsum.photos/seed/trainer1/100/100', role: 'Trainer', status: 'Active', locationId: 'L01' },
-  { id: 'S03', name: 'Amina Sharif', email: 'reception@fitsync.com', phone: '0732345678', joinDate: '2023-02-15', avatarUrl: 'https://picsum.photos/seed/staff2/100/100', role: 'Reception', status: 'Active', locationId: 'L01' },
-  { id: 'S07', name: 'Achieng Otieno', email: 'achieng.o@fitsync.com', phone: '0742345678', joinDate: '2022-08-20', avatarUrl: 'https://picsum.photos/seed/trainer4/100/100', role: 'Trainer', status: 'Active', locationId: 'L01' },
+  { id: 'S01', name: 'Maina Kamau', email: 'admin@fitsync.com', phone: '0712345678', joinDate: '2022-01-01', salary: 150000, avatarUrl: 'https://picsum.photos/seed/staff1/100/100', role: 'Admin', status: 'Active', locationId: 'L01' },
+  { id: 'S02', name: 'Juma Kalama', email: 'juma.k@fitsync.com', phone: '0722345678', joinDate: '2022-05-10', salary: 80000, avatarUrl: 'https://picsum.photos/seed/trainer1/100/100', role: 'Trainer', status: 'Active', locationId: 'L01' },
+  { id: 'S03', name: 'Amina Sharif', email: 'reception@fitsync.com', phone: '0732345678', joinDate: '2023-02-15', salary: 45000, avatarUrl: 'https://picsum.photos/seed/staff2/100/100', role: 'Reception', status: 'Active', locationId: 'L01' },
+  { id: 'S07', name: 'Achieng Otieno', email: 'achieng.o@fitsync.com', phone: '0742345678', joinDate: '2022-08-20', salary: 75000, avatarUrl: 'https://picsum.photos/seed/trainer4/100/100', role: 'Trainer', status: 'Active', locationId: 'L01' },
   
   // Nairobi (L02)
-  { id: 'S04', name: 'Chebet Koech', email: 'chebet.k@fitsync.com', phone: '0752345678', joinDate: '2023-01-05', avatarUrl: 'https://picsum.photos/seed/staff3/100/100', role: 'Trainer', status: 'Inactive', locationId: 'L02' },
-  { id: 'S05', name: 'Wambui Kimani', email: 'wambui.k@fitsync.com', phone: '0762345678', joinDate: '2021-11-11', avatarUrl: 'https://picsum.photos/seed/trainer2/100/100', role: 'Trainer', status: 'Active', locationId: 'L02' },
-  { id: 'S06', name: 'Nairobi Reception', email: 'reception.nbi@fitsync.com', phone: '0772345678', joinDate: '2021-10-01', avatarUrl: 'https://picsum.photos/seed/staff4/100/100', role: 'Reception', status: 'Active', locationId: 'L02' },
+  { id: 'S04', name: 'Chebet Koech', email: 'chebet.k@fitsync.com', phone: '0752345678', joinDate: '2023-01-05', salary: 78000, avatarUrl: 'https://picsum.photos/seed/staff3/100/100', role: 'Trainer', status: 'Inactive', locationId: 'L02' },
+  { id: 'S05', name: 'Wambui Kimani', email: 'wambui.k@fitsync.com', phone: '0762345678', joinDate: '2021-11-11', salary: 82000, avatarUrl: 'https://picsum.photos/seed/trainer2/100/100', role: 'Trainer', status: 'Active', locationId: 'L02' },
+  { id: 'S06', name: 'Nairobi Reception', email: 'reception.nbi@fitsync.com', phone: '0772345678', joinDate: '2021-10-01', salary: 48000, avatarUrl: 'https://picsum.photos/seed/staff4/100/100', role: 'Reception', status: 'Active', locationId: 'L02' },
   
   // Mombasa (L03)
-  { id: 'S08', name: 'Baraka Mwangi', email: 'baraka.m@fitsync.com', phone: '0782345678', joinDate: '2022-03-18', avatarUrl: 'https://picsum.photos/seed/trainer3/100/100', role: 'Trainer', status: 'Active', locationId: 'L03' },
-  { id: 'S09', name: 'Suleiman Said', email: 'reception.msa@fitsync.com', phone: '0792345678', joinDate: '2023-04-01', avatarUrl: 'https://picsum.photos/seed/staff5/100/100', role: 'Reception', status: 'Active', locationId: 'L03' },
+  { id: 'S08', name: 'Baraka Mwangi', email: 'baraka.m@fitsync.com', phone: '0782345678', joinDate: '2022-03-18', salary: 85000, avatarUrl: 'https://picsum.photos/seed/trainer3/100/100', role: 'Trainer', status: 'Active', locationId: 'L03' },
+  { id: 'S09', name: 'Suleiman Said', email: 'reception.msa@fitsync.com', phone: '0792345678', joinDate: '2023-04-01', salary: 46000, avatarUrl: 'https://picsum.photos/seed/staff5/100/100', role: 'Reception', status: 'Active', locationId: 'L03' },
 ];
 
 export const upcomingClasses: Omit<Class, 'date' | 'duration' | 'locationId'>[] = [
@@ -382,4 +385,12 @@ export const checkInHistoryData: Record<string, CheckInHistory[]> = {
     { date: '2023-06-07', checkIns: 125 },
   ],
 };
+    
+export const discounts: Discount[] = [
+    { id: 'D001', name: 'Student Discount', type: 'percentage', value: 15, appliesTo: 'all', description: '15% off for all students with a valid ID.', status: 'Active', startDate: '2024-01-01', endDate: '2024-12-31', locationId: 'all' },
+    { id: 'D002', name: 'Happy Hour', type: 'fixed', value: 200, appliesTo: 'service', serviceId: 'walkin-day-pass', description: 'KES 200 off Day Passes between 12 PM and 4 PM.', status: 'Active', locationId: 'L02' },
+    { id: 'D003', name: 'Staff Discount', type: 'percentage', value: 50, appliesTo: 'all', description: '50% off for all FitSync staff members.', status: 'Inactive', locationId: 'all' },
+    { id: 'D004', name: 'July Special', type: 'percentage', value: 10, appliesTo: 'all', description: '10% off all items for the month of July.', status: 'Active', startDate: '2024-07-01', endDate: '2024-07-31', locationId: 'L01' },
+];
+
     

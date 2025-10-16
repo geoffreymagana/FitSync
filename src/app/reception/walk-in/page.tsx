@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { walkInServices as initialWalkInServices, inventory } from "@/lib/data";
+import { walkInServices as initialWalkInServices, inventory, discounts as allDiscounts, Discount } from "@/lib/data";
 import { WalkInService, OrderItem, Transaction } from "@/lib/types";
 import { useState, useMemo, useEffect, useContext } from "react";
-import { CreditCard, Smartphone, Plus, Minus, X, CheckCircle, Mail, Banknote, Shirt, Search } from "lucide-react";
+import { CreditCard, Smartphone, Plus, Minus, X, CheckCircle, Mail, Banknote, Shirt, Search, Tag, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -24,6 +24,9 @@ import {
 import * as Lucide from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ReceptionContext } from "@/context/reception-context";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { isWithinInterval, startOfToday, isBefore, isAfter, parseISO, isSameDay } from "date-fns";
 
 const iconComponents: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = {
     Ticket: Lucide.Ticket,
@@ -53,6 +56,7 @@ export default function WalkInPage() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [lastCompletedTransaction, setLastCompletedTransaction] = useState<Transaction | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [appliedDiscount, setAppliedDiscount] = useState<Discount | null>(null);
 
     const posItems = useMemo(() => {
         const inventoryForPOS = inventory
@@ -110,9 +114,22 @@ export default function WalkInPage() {
         setOrderItems(prevItems => prevItems.filter(item => item.id !== serviceId));
     };
     
-    const total = useMemo(() => {
-        return orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    }, [orderItems]);
+    const { subtotal, discountAmount, total } = useMemo(() => {
+        const currentSubtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        let currentDiscountAmount = 0;
+
+        if (appliedDiscount) {
+            if (appliedDiscount.type === 'percentage') {
+                currentDiscountAmount = currentSubtotal * (appliedDiscount.value / 100);
+            } else { // fixed
+                currentDiscountAmount = appliedDiscount.value;
+            }
+        }
+        
+        const finalTotal = Math.max(0, currentSubtotal - currentDiscountAmount);
+        return { subtotal: currentSubtotal, discountAmount: currentDiscountAmount, total: finalTotal };
+
+    }, [orderItems, appliedDiscount]);
     
     const generateTransactionId = () => {
         if (!selectedLocation || orderItems.length === 0) return '';
@@ -133,6 +150,7 @@ export default function WalkInPage() {
             id: generateTransactionId(),
             items: orderItems,
             total,
+            discount: appliedDiscount ? { name: appliedDiscount.name, amount: discountAmount } : undefined,
             paymentMethod,
             customer: { phone: phoneNumber },
             timestamp: new Date().toISOString(),
@@ -180,6 +198,7 @@ export default function WalkInPage() {
         setEmail('');
         setPaymentStatus('idle');
         setLastCompletedTransaction(null);
+        setAppliedDiscount(null);
     }
     
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,6 +224,39 @@ export default function WalkInPage() {
             return acc;
         }, {} as Record<string, WalkInService[]>);
     }, [posItems, searchQuery]);
+
+    const availableDiscounts = useMemo(() => {
+        if (!selectedLocation) return [];
+        return allDiscounts.filter(d => {
+            if (d.status !== 'Active') return false;
+            
+            if (d.locationId !== 'all' && d.locationId !== selectedLocation.id) {
+                return false;
+            }
+
+            const today = startOfToday();
+            const hasStartDate = !!d.startDate;
+            const hasEndDate = !!d.endDate;
+            let isWithinDateRange = false;
+
+            if (hasStartDate && hasEndDate) {
+                isWithinDateRange = isWithinInterval(today, { start: parseISO(d.startDate!), end: parseISO(d.endDate!) });
+            } else if (hasStartDate) {
+                isWithinDateRange = isAfter(today, parseISO(d.startDate!)) || isSameDay(today, parseISO(d.startDate!));
+            } else if (hasEndDate) {
+                isWithinDateRange = isBefore(today, parseISO(d.endDate!)) || isSameDay(today, parseISO(d.endDate!));
+            } else {
+                isWithinDateRange = true; 
+            }
+
+            if (!isWithinDateRange) return false;
+
+            if (d.appliesTo === 'all') return true;
+
+            return orderItems.some(item => item.id === d.serviceId);
+        });
+    }, [orderItems, selectedLocation]);
+
 
     return (
         <div className="h-screen bg-muted/20 lg:h-[calc(100vh-64px)]">
@@ -258,7 +310,7 @@ export default function WalkInPage() {
                     {Object.entries(serviceCategories).map(([category, services]) => (
                         <div key={category} className="mb-8">
                             <h2 className="text-xl font-semibold mb-4">{category}</h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                 {services.map(service => {
                                     const Icon = getIconComponent(service.icon);
                                     return (
@@ -269,7 +321,7 @@ export default function WalkInPage() {
                                         >
                                             <CardContent className="p-4 flex flex-col items-center justify-center text-center flex-grow">
                                                 <div 
-                                                    className="w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+                                                    className="w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-transform group-hover:-translate-y-1"
                                                     style={{ backgroundColor: service.color.replace('0.8)', '1)') }}
                                                 >
                                                     <Icon className="h-8 w-8 text-white" />
@@ -322,7 +374,29 @@ export default function WalkInPage() {
                         {orderItems.length > 0 && (
                             <CardFooter className="flex-col !p-0 mt-auto">
                                <Separator />
-                               <div className="p-6 w-full space-y-4">
+                                <div className="p-6 w-full space-y-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span>Subtotal</span>
+                                        <span>KES {subtotal.toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm items-center">
+                                        <div className="flex items-center gap-1">
+                                            <Tag className="w-4 h-4 text-muted-foreground" />
+                                            <span>Discount</span>
+                                        </div>
+                                        <DiscountPopover 
+                                            discounts={availableDiscounts} 
+                                            appliedDiscount={appliedDiscount}
+                                            onSelect={setAppliedDiscount} 
+                                        />
+                                    </div>
+                                    {appliedDiscount && (
+                                        <div className="flex justify-between text-sm font-medium text-green-600 pl-5">
+                                            <span>{appliedDiscount.name}</span>
+                                            <span>- KES {discountAmount.toLocaleString()}</span>
+                                        </div>
+                                    )}
+                                    <Separator />
                                      <div className="flex justify-between font-bold text-lg">
                                         <span>Total</span>
                                         <span>KES {total.toLocaleString()}</span>
@@ -378,5 +452,55 @@ export default function WalkInPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function DiscountPopover({ discounts, appliedDiscount, onSelect }: { discounts: Discount[], appliedDiscount: Discount | null, onSelect: (d: Discount | null) => void }) {
+    const [open, setOpen] = useState(false);
+
+    const handleSelect = (discount: Discount | null) => {
+        onSelect(discount);
+        setOpen(false);
+    }
+    
+    if (discounts.length === 0) {
+        return <span className="text-muted-foreground text-sm">No discounts</span>
+    }
+    
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button variant="link" className="text-primary p-0 h-auto">
+                    {appliedDiscount ? 'Change' : 'Add Discount'}
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-0">
+                <Command>
+                    <CommandInput placeholder="Find discount..." />
+                    <CommandList>
+                        <CommandEmpty>No discount found.</CommandEmpty>
+                        <CommandGroup>
+                            {appliedDiscount && (
+                                <CommandItem onSelect={() => handleSelect(null)}>
+                                   <X className="mr-2 h-4 w-4 text-destructive" />
+                                   Remove Discount
+                                </CommandItem>
+                            )}
+                            {discounts.map(discount => (
+                                <CommandItem key={discount.id} onSelect={() => handleSelect(discount)} className="flex justify-between group">
+                                     <div>
+                                        <Check className={cn("mr-2 h-4 w-4 inline", appliedDiscount?.id === discount.id ? "opacity-100" : "opacity-0")} />
+                                        <span>{discount.name}</span>
+                                     </div>
+                                     <div className={cn("text-xs text-muted-foreground group-aria-selected:text-accent-foreground")}>
+                                        {discount.type === 'percentage' ? `${discount.value}%` : `KES ${discount.value}`}
+                                     </div>
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
     );
 }

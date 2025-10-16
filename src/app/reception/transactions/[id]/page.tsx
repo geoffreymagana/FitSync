@@ -99,6 +99,19 @@ export default function TransactionDetailsPage() {
                   </div>
                 ))}
               </div>
+              <Separator className="my-2" />
+               <div className="space-y-2 text-sm">
+                 <div className="flex justify-between">
+                    <p>Subtotal</p>
+                    <p>KES {transaction.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toLocaleString()}</p>
+                  </div>
+                {transaction.discount && (
+                    <div className="flex justify-between text-green-600">
+                        <p>Discount ({transaction.discount.name})</p>
+                        <p>- KES {transaction.discount.amount.toLocaleString()}</p>
+                    </div>
+                )}
+              </div>
               <Separator className="my-4" />
               <div className="flex justify-between font-bold text-xl">
                 <p>Total Paid</p>
