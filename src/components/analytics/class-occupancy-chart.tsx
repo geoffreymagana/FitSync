@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Pie, PieChart, Tooltip, Cell } from "recharts"
@@ -10,6 +11,8 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 export function ClassOccupancyChart({ locationId }: { locationId: string }) {
   const { data, config } = useMemo(() => {
     const locationData = classOccupancyData[locationId] || [];
+    if (locationData.length === 0) return { data: [], config: {} };
+
     const chartData = locationData.map((item, index) => ({
         name: item.name,
         value: item.booked,
@@ -26,6 +29,14 @@ export function ClassOccupancyChart({ locationId }: { locationId: string }) {
 
     return { data: chartData, config: chartConfig };
   }, [locationId]);
+
+  if (data.length === 0) {
+    return (
+      <div className="min-h-[200px] w-full aspect-square flex items-center justify-center text-muted-foreground">
+        No occupancy data available.
+      </div>
+    );
+  }
 
   return (
     <ChartContainer config={config} className="min-h-[200px] w-full aspect-square">

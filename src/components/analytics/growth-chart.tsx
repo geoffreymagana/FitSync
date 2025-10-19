@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Area, AreaChart } from "recharts"
@@ -21,8 +22,16 @@ export function GrowthChart({ locationId }: { locationId: string }) {
     return membershipGrowthData[locationId] || [];
   }, [locationId]);
 
+  if (!data || data.length === 0) {
+    return (
+      <div className="min-h-[250px] h-[250px] w-full flex items-center justify-center text-muted-foreground">
+        No membership data available for this period.
+      </div>
+    );
+  }
+
   return (
-    <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+    <ChartContainer config={chartConfig} className="min-h-[250px] h-[250px] w-full">
         <AreaChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis

@@ -1,22 +1,27 @@
 
+
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dumbbell, Calendar, Target, Plus, Flame, Utensils } from "lucide-react";
+import { Dumbbell, Calendar, Target, Plus, Ticket } from "lucide-react";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { members } from "@/lib/data";
 
 export default function MemberDashboardPage() {
     const { toast } = useToast();
     const [isWorkoutDialogOpen, setIsWorkoutDialogOpen] = useState(false);
     const [isMealDialogOpen, setIsMealDialogOpen] = useState(false);
+
+    // In a real app, this would come from auth context
+    const member = useMemo(() => members.find(m => m.id === 'M001'), []);
 
     const handleLogSubmit = (type: 'Workout' | 'Meal') => {
         if (type === 'Workout') {
@@ -33,7 +38,7 @@ export default function MemberDashboardPage() {
 
     return (
         <div className="p-4 md:p-6 space-y-6">
-            <PageHeader title="Welcome, Wanjiku!" />
+            <PageHeader title={`Welcome, ${member?.name}!`} />
             
             <Card>
                 <CardHeader>
@@ -64,6 +69,18 @@ export default function MemberDashboardPage() {
                         <p className="text-xs text-muted-foreground">Completed</p>
                     </CardContent>
                 </Card>
+                {member?.planType === 'pay-per-use' && (
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="text-base font-semibold">Check-ins Left</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-center text-center">
+                            <Ticket className="w-8 h-8 text-primary mb-2" />
+                            <p className="font-bold">{member.remainingCheckIns}</p>
+                            <p className="text-xs text-muted-foreground">on your pass</p>
+                        </CardContent>
+                    </Card>
+                )}
                  <Card>
                     <CardHeader>
                         <CardTitle className="text-base font-semibold">Book a Class</CardTitle>

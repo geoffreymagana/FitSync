@@ -15,9 +15,11 @@ export type Member = {
   name: string;
   email: string;
   avatarUrl: string;
-  plan: 'Basic' | 'Premium' | 'VIP';
+  plan: string;
   status: 'Active' | 'Inactive' | 'Pending';
   joinDate: string;
+  planType?: 'subscription' | 'pay-per-use';
+  remainingCheckIns?: number;
 };
 
 export type Trainer = {
@@ -54,6 +56,10 @@ export type Class = {
   spots: number;
   booked: number;
   color?: string;
+  isOnline?: boolean;
+  meetingUrl?: string;
+  price?: number;
+  paymentType?: 'free' | 'paid';
 };
 
 export type Payment = {
@@ -91,6 +97,9 @@ export type Plan = {
   name: string;
   price: number;
   features: string[];
+  type: 'subscription' | 'pay-per-use';
+  checkIns?: number; // Only for pay-per-use
+  status: 'Active' | 'Inactive';
 };
 
 export type Notification = {
@@ -171,4 +180,23 @@ export type Discount = {
     startDate?: string;
     endDate?: string;
     locationId: string;
+};
+
+export type Subscription = {
+    id: string;
+    member: Member;
+    planName: string;
+    status: 'active' | 'churned' | 'delinquent' | 'paused';
+    lastOrderAmount: number;
+    lastPaymentDate: string;
+    autoPayStatus: boolean;
+    cardOnFile: boolean;
+    trialStartDate: string;
+    trialConversionDate: string;
+    trialEndDate: string;
+    trialConversionStatus: string;
+    purchasedDate: string;
+    firstScheduleAttended: string;
+    lastScheduleAttended: string;
+    timeRemaining: string;
 };

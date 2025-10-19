@@ -1,9 +1,5 @@
 
-
-
-
-
-import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate, FinancialBreakdown, CheckInHistory, Discount } from './types';
+import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate, FinancialBreakdown, CheckInHistory, Discount, Subscription } from './types';
 
 export const locations: Location[] = [
   { id: 'L01', name: 'FitSync Meru', type: 'Main', address: '123 Meru-Nanyuki Rd, Meru', members: 450 },
@@ -29,19 +25,19 @@ export const trainerSpecializations: TrainerSpecialization[] = [
 
 export const members: Member[] = [
   // Meru
-  { id: 'M001', locationId: 'L01', name: 'Wanjiku Mwangi', email: 'wanjiku.m@example.com', avatarUrl: 'https://picsum.photos/seed/member1/100/100', plan: 'Premium', status: 'Active', joinDate: '2023-01-15' },
-  { id: 'M002', locationId: 'L01', name: 'Omondi Okoth', email: 'omondi.o@example.com', avatarUrl: 'https://picsum.photos/seed/member2/100/100', plan: 'Basic', status: 'Active', joinDate: '2023-02-20' },
-  { id: 'M007', locationId: 'L01', name: 'Akinyi Adhiambo', email: 'akinyi.a@example.com', avatarUrl: 'https://picsum.photos/seed/member7/100/100', plan: 'VIP', status: 'Active', joinDate: '2023-03-10' },
-  { id: 'M008', locationId: 'L01', name: 'Njeri Kamau', email: 'njeri.k@example.com', avatarUrl: 'https://picsum.photos/seed/member8/100/100', plan: 'Basic', status: 'Pending', joinDate: '2023-06-01' },
+  { id: 'M001', locationId: 'L01', name: 'Wanjiku Mwangi', email: 'wanjiku.m@example.com', avatarUrl: 'https://picsum.photos/seed/member1/100/100', plan: 'Premium', status: 'Active', joinDate: '2023-01-15', planType: 'subscription' },
+  { id: 'M002', locationId: 'L01', name: 'Omondi Okoth', email: 'omondi.o@example.com', avatarUrl: 'https://picsum.photos/seed/member2/100/100', plan: 'Basic', status: 'Active', joinDate: '2023-02-20', planType: 'subscription' },
+  { id: 'M007', locationId: 'L01', name: 'Akinyi Adhiambo', email: 'akinyi.a@example.com', avatarUrl: 'https://picsum.photos/seed/member7/100/100', plan: '10-Session Pass', status: 'Active', joinDate: '2023-03-10', planType: 'pay-per-use', remainingCheckIns: 6 },
+  { id: 'M008', locationId: 'L01', name: 'Njeri Kamau', email: 'njeri.k@example.com', avatarUrl: 'https://picsum.photos/seed/member8/100/100', plan: 'Basic', status: 'Pending', joinDate: '2023-06-01', planType: 'subscription' },
 
 
   // Nairobi
-  { id: 'M003', locationId: 'L02', name: 'Fatuma Ali', email: 'fatuma.a@example.com', avatarUrl: 'https://picsum.photos/seed/member3/100/100', plan: 'VIP', status: 'Inactive', joinDate: '2022-11-10' },
-  { id: 'M004', locationId: 'L02', name: 'Kiprono Bett', email: 'kiprono.b@example.com', avatarUrl: 'https://picsum.photos/seed/member4/100/100', plan: 'Premium', status: 'Active', joinDate: '2023-03-05' },
+  { id: 'M003', locationId: 'L02', name: 'Fatuma Ali', email: 'fatuma.a@example.com', avatarUrl: 'https://picsum.photos/seed/member3/100/100', plan: 'VIP', status: 'Inactive', joinDate: '2022-11-10', planType: 'subscription' },
+  { id: 'M004', locationId: 'L02', name: 'Kiprono Bett', email: 'kiprono.b@example.com', avatarUrl: 'https://picsum.photos/seed/member4/100/100', plan: 'Premium', status: 'Active', joinDate: '2023-03-05', planType: 'subscription' },
   
   // Mombasa
-  { id: 'M005', locationId: 'L03', name: 'Naliaka Wanjala', email: 'naliaka.w@example.com', avatarUrl: 'https://picsum.photos/seed/member5/100/100', plan: 'Basic', status: 'Pending', joinDate: '2023-05-01' },
-  { id: 'M006', locationId: 'L03', name: 'Mutua Kilonzo', email: 'mutua.k@example.com', avatarUrl: 'https://picsum.photos/seed/member6/100/100', plan: 'Premium', status: 'Active', joinDate: '2023-04-12' },
+  { id: 'M005', locationId: 'L03', name: 'Naliaka Wanjala', email: 'naliaka.w@example.com', avatarUrl: 'https://picsum.photos/seed/member5/100/100', plan: 'Basic', status: 'Pending', joinDate: '2023-05-01', planType: 'subscription' },
+  { id: 'M006', locationId: 'L03', name: 'Mutua Kilonzo', email: 'mutua.k@example.com', avatarUrl: 'https://picsum.photos/seed/member6/100/100', plan: 'Premium', status: 'Active', joinDate: '2023-04-12', planType: 'subscription' },
 ];
 
 export const trainers: Trainer[] = [
@@ -283,6 +279,8 @@ export const plans: Plan[] = [
     name: 'Basic',
     price: 3000,
     features: ['Access to gym floor', 'Standard locker room access', '1 free guest pass per month'],
+    type: 'subscription',
+    status: 'Active',
   },
   {
     id: 'plan-premium',
@@ -294,6 +292,8 @@ export const plans: Plan[] = [
       'Access to sauna and steam room',
       '5 free guest passes per month',
     ],
+    type: 'subscription',
+    status: 'Active',
   },
   {
     id: 'plan-vip',
@@ -306,8 +306,61 @@ export const plans: Plan[] = [
       'Dedicated VIP locker room',
       'Unlimited guest passes',
     ],
+    type: 'subscription',
+    status: 'Active',
+  },
+    {
+    id: 'plan-10-session',
+    name: '10-Session Pass',
+    price: 4000,
+    features: [
+      '10 gym check-ins',
+      'Access to gym floor',
+      'Expires in 3 months',
+    ],
+    type: 'pay-per-use',
+    checkIns: 10,
+    status: 'Active',
   },
 ];
+
+export const fitSyncPlans: Plan[] = [
+  {
+    id: 'fitsync-starter',
+    name: 'Starter',
+    price: 5000,
+    features: ['Up to 500 members', 'Basic Admin Dashboard', 'Member & Reception Apps', 'Standard Support'],
+    type: 'subscription',
+    status: 'Active',
+  },
+  {
+    id: 'fitsync-pro',
+    name: 'Pro',
+    price: 10000,
+    features: [
+      'Up to 2000 members',
+      'All Admin Features',
+      'All Dashboards included',
+      'Priority Support',
+    ],
+    type: 'subscription',
+    status: 'Active',
+  },
+  {
+    id: 'fitsync-enterprise',
+    name: 'Enterprise',
+    price: 25000,
+    features: [
+      'Unlimited members',
+      'Multi-location support',
+      'Dedicated Account Manager',
+      'Custom Branding',
+    ],
+    type: 'subscription',
+    status: 'Active',
+  },
+];
+
 
 export const notifications: Record<string, Notification[]> = {
     admin: [
@@ -393,4 +446,153 @@ export const discounts: Discount[] = [
     { id: 'D004', name: 'July Special', type: 'percentage', value: 10, appliesTo: 'all', description: '10% off all items for the month of July.', status: 'Active', startDate: '2024-07-01', endDate: '2024-07-31', locationId: 'L01' },
 ];
 
+export const subscriptions: Subscription[] = [
+    {
+        id: 'SUB001',
+        member: members.find(m => m.id === 'M001')!,
+        planName: 'Premium',
+        status: 'active',
+        lastOrderAmount: 5000,
+        lastPaymentDate: '2024-07-01',
+        autoPayStatus: true,
+        cardOnFile: true,
+        trialStartDate: 'N/A',
+        trialConversionDate: 'N/A',
+        trialEndDate: 'N/A',
+        trialConversionStatus: 'N/A',
+        purchasedDate: '2023-01-15',
+        firstScheduleAttended: '2023-01-16',
+        lastScheduleAttended: '2024-07-15',
+        timeRemaining: 'N/A'
+    },
+    {
+        id: 'SUB002',
+        member: members.find(m => m.id === 'M002')!,
+        planName: 'Basic',
+        status: 'active',
+        lastOrderAmount: 3000,
+        lastPaymentDate: '2024-07-10',
+        autoPayStatus: true,
+        cardOnFile: true,
+        trialStartDate: 'N/A',
+        trialEndDate: 'N/A',
+        trialConversionDate: 'N/A',
+        trialConversionStatus: 'N/A',
+        purchasedDate: '2023-02-20',
+        firstScheduleAttended: '2023-02-21',
+        lastScheduleAttended: '2024-07-12',
+        timeRemaining: 'N/A'
+    },
+    {
+        id: 'SUB003',
+        member: members.find(m => m.id === 'M003')!,
+        planName: 'VIP',
+        status: 'churned',
+        lastOrderAmount: 8000,
+        lastPaymentDate: '2024-03-10',
+        autoPayStatus: false,
+        cardOnFile: true,
+        trialStartDate: 'N/A',
+        trialEndDate: 'N/A',
+        trialConversionDate: 'N/A',
+        trialConversionStatus: 'N/A',
+        purchasedDate: '2022-11-10',
+        firstScheduleAttended: '2022-11-11',
+        lastScheduleAttended: '2024-03-05',
+        timeRemaining: 'N/A'
+    },
+    {
+        id: 'SUB004',
+        member: members.find(m => m.id === 'M004')!,
+        planName: 'Premium',
+        status: 'delinquent',
+        lastOrderAmount: 5000,
+        lastPaymentDate: '2024-06-02',
+        autoPayStatus: true,
+        cardOnFile: true,
+        trialStartDate: 'N/A',
+        trialEndDate: 'N/A',
+        trialConversionDate: 'N/A',
+        trialConversionStatus: 'N/A',
+        purchasedDate: '2023-03-05',
+        firstScheduleAttended: '2023-03-06',
+        lastScheduleAttended: '2024-05-28',
+        timeRemaining: 'N/A'
+    },
+     {
+        id: 'SUB005',
+        member: members.find(m => m.id === 'M006')!,
+        planName: 'Premium',
+        status: 'paused',
+        lastOrderAmount: 5000,
+        lastPaymentDate: '2024-05-12',
+        autoPayStatus: false,
+        cardOnFile: true,
+        trialStartDate: 'N/A',
+        trialEndDate: 'N/A',
+        trialConversionDate: 'N/A',
+        trialConversionStatus: 'N/A',
+        purchasedDate: '2023-04-12',
+        firstScheduleAttended: '2023-04-13',
+        lastScheduleAttended: '2024-05-10',
+        timeRemaining: 'N/A'
+    },
+];
+
+export const subscriptionsByPlanData = [
+  { name: 'Basic', count: 150 },
+  { name: 'Premium', count: 250 },
+  { name: 'VIP', count: 50 },
+  { name: '10-Session Pass', count: 75 },
+];
     
+export const newVsChurnData: Record<string, { month: string, new: number, churned: number }[]> = {
+  'L01': [
+    { month: 'Jan', new: 30, churned: 15 }, { month: 'Feb', new: 35, churned: 20 },
+    { month: 'Mar', new: 50, churned: 25 }, { month: 'Apr', new: 45, churned: 22 },
+    { month: 'May', new: 60, churned: 30 }, { month: 'Jun', new: 65, churned: 28 },
+  ],
+  'L02': [
+    { month: 'Jan', new: 25, churned: 10 }, { month: 'Feb', new: 30, churned: 15 },
+    { month: 'Mar', new: 45, churned: 20 }, { month: 'Apr', new: 40, churned: 18 },
+    { month: 'May', new: 55, churned: 25 }, { month: 'Jun', new: 60, churned: 22 },
+  ],
+  'L03': [
+    { month: 'Jan', new: 15, churned: 5 }, { month: 'Feb', new: 20, churned: 8 },
+    { month: 'Mar', new: 25, churned: 10 }, { month: 'Apr', new: 30, churned: 12 },
+    { month: 'May', new: 35, churned: 15 }, { month: 'Jun', new: 40, churned: 18 },
+  ],
+};
+
+export const revenuePerMemberData: Record<string, { month: string, arpu: number }[]> = {
+  'L01': [
+    { month: 'Jan', arpu: 3100 }, { month: 'Feb', arpu: 3250 }, { month: 'Mar', arpu: 3300 },
+    { month: 'Apr', arpu: 3400 }, { month: 'May', arpu: 3550 }, { month: 'Jun', arpu: 3600 },
+  ],
+  'L02': [
+    { month: 'Jan', arpu: 3500 }, { month: 'Feb', arpu: 3600 }, { month: 'Mar', arpu: 3750 },
+    { month: 'Apr', arpu: 3800 }, { month: 'May', arpu: 3900 }, { month: 'Jun', arpu: 4000 },
+  ],
+  'L03': [
+    { month: 'Jan', arpu: 2800 }, { month: 'Feb', arpu: 2900 }, { month: 'Mar', arpu: 3000 },
+    { month: 'Apr', arpu: 3100 }, { month: 'May', arpu: 3200 }, { month: 'Jun', arpu: 3300 },
+  ],
+};
+
+export const topSellingItemsData: Record<string, { name: string, unitsSold: number }[]> = {
+  'L01': [
+    { name: 'Day Pass', unitsSold: 250 }, { name: 'Water Bottle', unitsSold: 180 },
+    { name: 'Protein Shake', unitsSold: 150 }, { name: 'PT Session', unitsSold: 120 },
+    { name: 'Towel Rental', unitsSold: 90 },
+  ],
+  'L02': [
+    { name: 'Day Pass', unitsSold: 350 }, { name: 'PT Session', unitsSold: 200 },
+    { name: 'Protein Shake', unitsSold: 180 }, { name: 'Water Bottle', unitsSold: 150 },
+    { name: 'Towel Rental', unitsSold: 110 },
+  ],
+  'L03': [
+    { name: 'Day Pass', unitsSold: 150 }, { name: 'Water Bottle', unitsSold: 120 },
+    { name: 'Protein Shake', unitsSold: 100 }, { name: 'PT Session', unitsSold: 80 },
+    { name: 'Towel Rental', unitsSold: 60 },
+  ],
+};

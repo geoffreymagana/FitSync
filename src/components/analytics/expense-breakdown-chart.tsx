@@ -12,6 +12,8 @@ const COLORS = ["#FF8042", "#FFBB28", "#00C49F", "#0088FE", "#8884d8"];
 export function ExpenseBreakdownChart({ locationId }: { locationId: string }) {
   const { data, config } = useMemo(() => {
     const locationData: FinancialBreakdown[] = expenseBreakdownData[locationId] || [];
+    if (locationData.length === 0) return { data: [], config: {} };
+    
     const chartData = locationData.map((item, index) => ({
       ...item,
       fill: COLORS[index % COLORS.length]
@@ -27,6 +29,14 @@ export function ExpenseBreakdownChart({ locationId }: { locationId: string }) {
 
     return { data: chartData, config: chartConfig };
   }, [locationId]);
+
+  if (data.length === 0) {
+    return (
+      <div className="min-h-[200px] w-full aspect-square flex items-center justify-center text-muted-foreground">
+        No expense data available.
+      </div>
+    );
+  }
 
   return (
     <ChartContainer config={config} className="min-h-[200px] w-full aspect-square">

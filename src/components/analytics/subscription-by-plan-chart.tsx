@@ -3,48 +3,38 @@
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
-import { checkInHistoryData } from "@/lib/data"
-import { useMemo } from "react"
-import { format, parseISO } from "date-fns"
+import { subscriptionsByPlanData } from "@/lib/data"
 
 const chartConfig = {
-  checkIns: {
-    label: "Check-ins",
+  count: {
+    label: "Subscriptions",
     color: "hsl(var(--primary))",
   },
 }
 
-export function CheckInHistoryChart({ locationId }: { locationId: string }) {
-  const data = useMemo(() => {
-    const locationData = checkInHistoryData[locationId] || [];
-    if (locationData.length === 0) return [];
-    return locationData.map(item => ({
-      ...item,
-      date: format(parseISO(item.date), "MMM d")
-    }));
-  }, [locationId]);
-
-  if (!data || data.length === 0) {
+export function SubscriptionByPlanChart() {
+  if (!subscriptionsByPlanData || subscriptionsByPlanData.length === 0) {
     return (
       <div className="min-h-[250px] h-[250px] w-full flex items-center justify-center text-muted-foreground">
-        No check-in data available for this period.
+        No subscription data available.
       </div>
     );
   }
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[250px] h-[250px] w-full">
-      <BarChart accessibilityLayer data={data}>
+      <BarChart accessibilityLayer data={subscriptionsByPlanData}>
         <CartesianGrid vertical={false} />
         <XAxis
-          dataKey="date"
+          dataKey="name"
           tickLine={false}
           tickMargin={10}
           axisLine={false}
+          className="text-xs"
         />
         <YAxis />
         <Tooltip cursor={false} content={<ChartTooltipContent />} />
-        <Bar dataKey="checkIns" fill="var(--color-checkIns)" radius={4} />
+        <Bar dataKey="count" fill="var(--color-count)" radius={4} />
       </BarChart>
     </ChartContainer>
   )

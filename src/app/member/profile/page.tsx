@@ -125,7 +125,7 @@ export default function MemberProfilePage() {
                 <Link href="/member/billing" className="flex items-center justify-between p-4 rounded-lg hover:bg-accent">
                     <div className="flex items-center gap-4">
                         <CreditCard className="w-5 h-5 text-muted-foreground" />
-                        <span className="font-medium">Billing & Membership</span>
+                        <span className="font-medium">Billing & Plans</span>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </Link>
@@ -148,3 +148,5 @@ export default function MemberProfilePage() {
         </div>
     );
 }
+
+    

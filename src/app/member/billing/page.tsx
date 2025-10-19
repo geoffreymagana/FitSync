@@ -13,10 +13,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { PlanCard } from "@/components/plan-card";
 
 export default function MemberBillingPage() {
     const { toast } = useToast();
-    const memberPayments = payments.filter(p => p.memberId === 'M001'); // Example filter
+    const memberPayments = payments.filter(p => p.memberId === 'M001');
 
     const handleMpesaPay = () => {
         toast({
@@ -47,7 +48,9 @@ export default function MemberBillingPage() {
                 </CardContent>
                 <CardFooter className="flex gap-2">
                     <Button onClick={handleMpesaPay}>Pay with M-Pesa</Button>
-                    <Button variant="outline">Change Plan</Button>
+                    <Button variant="outline" asChild>
+                        <Link href="/member/plans">Change Plan</Link>
+                    </Button>
                 </CardFooter>
             </Card>
 
@@ -135,3 +138,5 @@ export default function MemberBillingPage() {
         </div>
     );
 }
+
+    

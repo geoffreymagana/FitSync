@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { PageHeader } from "@/components/page-header";
@@ -7,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { classes as initialClasses, trainers, Class } from "@/lib/data";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Video, Link as LinkIcon, Wallet } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -82,6 +83,27 @@ export default function InstructorClassDetailsPage() {
                             <div className="text-muted-foreground">{cls.duration} minutes</div>
                         </div>
                     </div>
+                    {cls.isOnline && cls.meetingUrl && (
+                      <>
+                        <Separator />
+                        <div className="grid gap-3">
+                          <div className="font-semibold flex items-center gap-2"><Video className="w-4 h-4"/> Online Class</div>
+                          <a href={cls.meetingUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline flex items-center gap-2">
+                            <LinkIcon className="w-4 h-4" />
+                            Join Meeting
+                          </a>
+                        </div>
+                      </>
+                    )}
+                    {cls.paymentType === 'paid' && (
+                        <>
+                            <Separator />
+                            <div className="grid gap-3">
+                                <div className="font-semibold flex items-center gap-2"><Wallet className="w-4 h-4"/> Paid Class</div>
+                                <div className="text-muted-foreground font-bold text-lg">KES {cls.price?.toLocaleString()}</div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </CardContent>
       </Card>

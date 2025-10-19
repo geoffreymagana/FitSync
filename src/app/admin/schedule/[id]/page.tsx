@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { PageHeader } from "@/components/page-header";
@@ -7,13 +8,15 @@ import { Button } from "@/components/ui/button";
 import { classes as initialClasses, trainers, Class, Trainer } from "@/lib/data";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Edit, Trash, Save } from "lucide-react";
+import { ChevronLeft, Edit, Trash, Save, Video, Link as LinkIcon, Wallet } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const LOCAL_STORAGE_KEY = 'fitsync_all_classes';
 
@@ -29,7 +32,9 @@ const ClassForm = ({
 }) => {
   if (!classData) return null;
   const today = new Date().toISOString().split('T')[0];
-  
+  const [isOnline, setIsOnline] = useState(classData?.isOnline || false);
+  const [paymentType, setPaymentType] = useState(classData?.paymentType || 'free');
+
   if (!isEditing) {
       return (
          <div className="grid gap-6">
@@ -54,6 +59,27 @@ const ClassForm = ({
                     <div className="text-muted-foreground">{classData.duration} minutes</div>
                 </div>
             </div>
+             {classData.isOnline && classData.meetingUrl && (
+              <>
+                <Separator />
+                <div className="grid gap-3">
+                  <div className="font-semibold flex items-center gap-2"><Video className="w-4 h-4"/> Online Class</div>
+                  <a href={classData.meetingUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline flex items-center gap-2">
+                    <LinkIcon className="w-4 h-4" />
+                    Join Meeting
+                  </a>
+                </div>
+              </>
+            )}
+            {classData.paymentType === 'paid' && (
+              <>
+                <Separator />
+                <div className="grid gap-3">
+                    <div className="font-semibold flex items-center gap-2"><Wallet className="w-4 h-4"/> Paid Class</div>
+                    <div className="text-muted-foreground font-bold text-lg">KES {classData.price?.toLocaleString()}</div>
+                </div>
+              </>
+            )}
         </div>
       )
   }
@@ -97,6 +123,37 @@ const ClassForm = ({
             <Input id="duration" name="duration" type="number" placeholder="60" defaultValue={classData.duration} required />
         </div>
       </div>
+      <div className="space-y-4 rounded-md border p-4">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="isOnline" className="font-semibold">Online Class</Label>
+          <Switch id="isOnline" name="isOnline" checked={isOnline} onCheckedChange={setIsOnline} />
+        </div>
+        {isOnline && (
+          <div className="space-y-2 pt-2">
+            <Label htmlFor="meetingUrl">Zoom Meeting URL</Label>
+            <Input id="meetingUrl" name="meetingUrl" placeholder="https://zoom.us/j/..." defaultValue={classData?.meetingUrl || ''} />
+          </div>
+        )}
+      </div>
+       <div className="space-y-4 rounded-md border p-4">
+            <Label className="font-semibold">Payment</Label>
+            <RadioGroup value={paymentType} onValueChange={(value) => setPaymentType(value)}>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="free" id="r1" />
+                    <Label htmlFor="r1">Free</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="paid" id="r2" />
+                    <Label htmlFor="r2">Paid</Label>
+                </div>
+            </RadioGroup>
+            {paymentType === 'paid' && (
+                <div className="space-y-2 pt-2">
+                    <Label htmlFor="price">Price (KES)</Label>
+                    <Input id="price" name="price" type="number" placeholder="500" defaultValue={classData?.price || ''} required />
+                </div>
+            )}
+        </div>
     </div>
   );
 };
@@ -139,7 +196,7 @@ export default function ClassDetailsPage() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     
-    const updatedClassData = {
+    const updatedClassData: Class = {
       ...cls,
       name: formData.get("name") as string,
       trainer: formData.get("trainer") as string,
@@ -147,6 +204,10 @@ export default function ClassDetailsPage() {
       time: formData.get("time") as string,
       spots: Number(formData.get("spots")),
       duration: Number(formData.get("duration")),
+      isOnline: formData.get('isOnline') === 'on',
+      meetingUrl: formData.get('meetingUrl') as string,
+      paymentType: formData.get('paymentType') as 'free' | 'paid',
+      price: formData.get('paymentType') === 'paid' ? Number(formData.get("price")) : 0,
     };
 
     const updatedClasses = classes.map(c => c.id === cls.id ? updatedClassData : c);

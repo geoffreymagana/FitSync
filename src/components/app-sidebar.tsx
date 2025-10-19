@@ -1,5 +1,4 @@
 
-
 'use client';
 import {
   LayoutDashboard,
@@ -21,6 +20,7 @@ import {
   ShoppingBag,
   Receipt,
   UserCheck,
+  Bookmark,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -66,6 +66,7 @@ const adminNavGroups: NavGroup[] = [
     {
         title: "Finance & Plans",
         items: [
+            { href: "/admin/subscriptions", icon: Bookmark, label: "Subscriptions" },
             { href: "/admin/payments", icon: CreditCard, label: "Payments" },
             { href: "/admin/plans", icon: Award, label: "Plans" },
         ],

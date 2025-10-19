@@ -4,7 +4,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { add, format, parse, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isToday, isSameDay, set, getDay, addDays, eachWeekOfInterval, nextByDay, parseISO, isBefore, formatISO } from "date-fns";
-import { PlusCircle, Ban, Unlock, ChevronLeft, ChevronRight } from "lucide-react";
+import { PlusCircle, Ban, Unlock, ChevronLeft, ChevronRight, Video } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +30,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "../ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 const LOCAL_STORAGE_KEY = 'fitsync_all_classes';
 
@@ -112,6 +113,8 @@ const ClassForm = ({
     const [isRecurring, setIsRecurring] = useState(false);
     const [recurrence, setRecurrence] = useState<any>(null);
     const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
+    const [isOnline, setIsOnline] = useState(classData?.isOnline || false);
+    const [paymentType, setPaymentType] = useState(classData?.paymentType || 'free');
 
     const timeSlots = useMemo(() => generateTimeSlots(selectedDate), [selectedDate]);
 
@@ -147,6 +150,10 @@ const ClassForm = ({
             time: formData.get("time") as string,
             spots: Number(formData.get("spots")),
             duration: Number(formData.get("duration")),
+            isOnline: formData.get('isOnline') === 'on',
+            meetingUrl: formData.get('meetingUrl') as string,
+            paymentType: paymentType as 'free' | 'paid',
+            price: paymentType === 'paid' ? Number(formData.get("price")) : 0,
         };
 
         if (classesForDay && classesForDay.length >= 5 && !classData) {
@@ -171,79 +178,117 @@ const ClassForm = ({
   return (
     <>
     <form onSubmit={handleSubmit}>
-        <ScrollArea className="h-[60vh] sm:h-auto">
+        <ScrollArea className="h-[70vh] sm:h-auto">
             <div className="space-y-4 py-4 px-1 md:px-6">
-                <div className="space-y-2">
-                <Label htmlFor="name">Class Name</Label>
-                <Input id="name" name="name" placeholder="e.g., Morning Yoga" defaultValue={classData?.name} required />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Class Name</Label>
+                        <Input id="name" name="name" placeholder="e.g., Morning Yoga" defaultValue={classData?.name} required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="trainer">Trainer</Label>
+                        {role === 'instructor' ? (
+                            <p className="font-semibold text-muted-foreground pt-2">{instructorName}</p>
+                        ) : (
+                            <Select name="trainer" defaultValue={classData?.trainer} required>
+                            <SelectTrigger id="trainer">
+                                <SelectValue placeholder="Select a trainer" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {locationTrainers.map(t => (
+                                <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                            </Select>
+                        )}
+                    </div>
                 </div>
-                <div className="space-y-2">
-                <Label htmlFor="trainer">Trainer</Label>
-                {role === 'instructor' ? (
-                    <p className="font-semibold text-muted-foreground pt-2">{instructorName}</p>
-                ) : (
-                    <Select name="trainer" defaultValue={classData?.trainer} required>
-                    <SelectTrigger id="trainer">
-                        <SelectValue placeholder="Select a trainer" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {locationTrainers.map(t => (
-                        <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                    </Select>
-                )}
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <div className="space-y-2">
-                    <Label htmlFor="time">Time</Label>
-                    <Select name="time" defaultValue={classData?.time} required>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="time">Time</Label>
+                        <Select name="time" defaultValue={classData?.time} required>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a time" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {timeSlots.map(slot => (
+                                    <SelectItem key={slot} value={slot} disabled={isSlotBooked(slot)}>
+                                        {slot} {isSlotBooked(slot) && "(Booked)"}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="duration">Duration</Label>
+                        <Select name="duration" defaultValue={classData?.duration?.toString() || '60'} required>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select a time" />
+                            <SelectValue placeholder="Select duration" />
                         </SelectTrigger>
                         <SelectContent>
-                            {timeSlots.map(slot => (
-                                <SelectItem key={slot} value={slot} disabled={isSlotBooked(slot)}>
-                                    {slot} {isSlotBooked(slot) && "(Booked)"}
-                                </SelectItem>
-                            ))}
+                            <SelectItem value="30">30 min</SelectItem>
+                            <SelectItem value="45">45 min</SelectItem>
+                            <SelectItem value="60">60 min</SelectItem>
+                            <SelectItem value="90">90 min</SelectItem>
                         </SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="duration">Duration (minutes)</Label>
-                    <Select name="duration" defaultValue={classData?.duration?.toString() || '60'} required>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select duration" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="30">30 minutes</SelectItem>
-                        <SelectItem value="45">45 minutes</SelectItem>
-                        <SelectItem value="60">60 minutes</SelectItem>
-                        <SelectItem value="90">90 minutes</SelectItem>
-                    </SelectContent>
-                    </Select>
-                </div>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="spots">Available Spots</Label>
-                    <Input id="spots" name="spots" type="number" placeholder="100" defaultValue={classData?.spots || ''} onInput={handleSpotsInput} required />
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="spots">Spots</Label>
+                        <Input id="spots" name="spots" type="number" placeholder="e.g. 25" defaultValue={classData?.spots || ''} onInput={handleSpotsInput} required />
+                    </div>
                 </div>
                 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4 rounded-md border p-4">
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="isOnline" className="font-semibold">Online Class</Label>
+                            <Switch id="isOnline" name="isOnline" checked={isOnline} onCheckedChange={setIsOnline} />
+                        </div>
+                        {isOnline && (
+                            <div className="space-y-2 pt-2">
+                                <Label htmlFor="meetingUrl">Zoom Meeting URL</Label>
+                                <Input id="meetingUrl" name="meetingUrl" placeholder="https://zoom.us/j/..." defaultValue={classData?.meetingUrl || ''} />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-4 rounded-md border p-4">
+                        <Label className="font-semibold">Payment</Label>
+                        <RadioGroup defaultValue={paymentType} onValueChange={(value) => setPaymentType(value)} className="flex gap-4">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="free" id="r1" />
+                                <Label htmlFor="r1">Free</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="paid" id="r2" />
+                                <Label htmlFor="r2">Paid</Label>
+                            </div>
+                        </RadioGroup>
+                        {paymentType === 'paid' && (
+                            <div className="space-y-2 pt-2">
+                                <Label htmlFor="price">Price (KES)</Label>
+                                <Input id="price" name="price" type="number" placeholder="500" defaultValue={classData?.price || ''} required />
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+
                 {!classData && (
                     <div className="space-y-4 rounded-md border p-4">
                     <div className="flex items-center justify-between">
                         <Label htmlFor="recurring-switch" className="font-semibold">Set Recurring Class</Label>
-                         {isMobile ? (
-                             <Button type="button" variant="link" onClick={() => setIsRecurrenceModalOpen(true)}>
+                        {isMobile ? (
+                            <Button type="button" variant="link" onClick={() => setIsRecurrenceModalOpen(true)}>
                                 {isRecurring ? 'Edit' : 'Set'}
-                             </Button>
-                         ) : (
+                            </Button>
+                        ) : (
                             <Switch id="recurring-switch" checked={isRecurring} onCheckedChange={setIsRecurring} />
-                         )}
+                        )}
                     </div>
                     {isRecurring && !isMobile && (
-                         <RecurrenceForm onSave={handleSaveRecurrence} date={selectedDate} initialData={recurrence} />
+                        <RecurrenceForm onSave={handleSaveRecurrence} date={selectedDate} initialData={recurrence} />
                     )}
                     </div>
                 )}
@@ -480,10 +525,13 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link href={href} onClick={(e) => e.stopPropagation()} className="block">
-                    <div className={cn("p-1 rounded-md text-xs text-black", cls.color, role === 'instructor' && cls.trainer !== instructorName ? 'opacity-50 border border-dashed border-gray-500' : '')}>
-                      <p className="font-semibold truncate">{cls.name}</p>
-                      <p className="truncate">{cls.time}</p>
-                      {role === 'instructor' && cls.trainer !== instructorName && <p className="truncate text-[10px]">({cls.trainer})</p>}
+                    <div className={cn("p-1 rounded-md text-xs text-black flex items-center gap-1", cls.color, role === 'instructor' && cls.trainer !== instructorName ? 'opacity-50 border border-dashed border-gray-500' : '')}>
+                      {cls.isOnline && <Video className="w-3 h-3 flex-shrink-0" />}
+                      <div className="truncate">
+                        <p className="font-semibold truncate">{cls.name}</p>
+                        <p className="truncate">{cls.time}</p>
+                        {role === 'instructor' && cls.trainer !== instructorName && <p className="truncate text-[10px]">({cls.trainer})</p>}
+                      </div>
                     </div>
                   </Link>
                 </TooltipTrigger>
@@ -494,6 +542,7 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
                              <p><strong>Trainer:</strong> {cls.trainer}</p>
                              <p><strong>Time:</strong> {format(parse(cls.time, 'HH:mm', new Date()), 'p')} - {format(add(parse(cls.time, 'HH:mm', new Date()), { minutes: cls.duration }), 'p')}</p>
                              <p><strong>Occupancy:</strong> {cls.booked} / {cls.spots}</p>
+                             {cls.isOnline && <p className="flex items-center gap-2"><Video className="w-4 h-4"/> Online Class</p>}
                         </div>
                     </TooltipContent>
                  )}
@@ -582,7 +631,7 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
         ))}
       </div>
        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogContent className="sm:max-w-md md:max-w-lg p-0">
+          <DialogContent className="sm:max-w-2xl p-0">
               <DialogHeader className="p-6 pb-0">
                   <DialogTitle>Add New Class</DialogTitle>
                     <DialogDescription>

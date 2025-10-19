@@ -3,25 +3,30 @@
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
-import { monthlyIncomeData } from "@/lib/data"
+import { revenuePerMemberData } from "@/lib/data"
 import { useMemo } from "react"
 
 const chartConfig = {
-  income: {
-    label: "Income",
+  arpu: {
+    label: "ARPU",
     color: "hsl(var(--primary))",
   },
 }
 
-export function IncomeChart({ locationId }: { locationId: string }) {
+export function RevenuePerMemberChart({ locationId }: { locationId: string }) {
   const data = useMemo(() => {
-    return monthlyIncomeData[locationId] || [];
+    const locationData = revenuePerMemberData[locationId] || [];
+    if (locationData.length === 0) return [];
+    return locationData.map(item => ({
+      ...item,
+      month: item.month.slice(0, 3)
+    }));
   }, [locationId]);
 
   if (!data || data.length === 0) {
     return (
       <div className="min-h-[250px] h-[250px] w-full flex items-center justify-center text-muted-foreground">
-        No income data available for this period.
+        No ARPU data available for this period.
       </div>
     );
   }
@@ -35,13 +40,10 @@ export function IncomeChart({ locationId }: { locationId: string }) {
           tickLine={false}
           tickMargin={10}
           axisLine={false}
-          tickFormatter={(value) => value.slice(0, 3)}
         />
-        <YAxis
-          tickFormatter={(value) => `KES ${Number(value) / 1000}k`}
-        />
-        <Tooltip cursor={false} content={<ChartTooltipContent formatter={(value, name, props) => `KES ${Number(value).toLocaleString()}`} />} />
-        <Bar dataKey="income" fill="var(--color-income)" radius={4} />
+        <YAxis tickFormatter={(value) => `KES ${value.toLocaleString()}`} />
+        <Tooltip cursor={false} content={<ChartTooltipContent formatter={(value) => `KES ${Number(value).toLocaleString()}`} />} />
+        <Bar dataKey="arpu" fill="var(--color-arpu)" radius={4} />
       </BarChart>
     </ChartContainer>
   )
