@@ -48,7 +48,7 @@ export type Staff = {
 export type Class = {
   id: string;
   locationId: string;
-  name: string;
+  name:string;
   trainer: string;
   time: string;
   date: string;
@@ -60,6 +60,9 @@ export type Class = {
   meetingUrl?: string;
   price?: number;
   paymentType?: 'free' | 'paid';
+  status?: 'Approved' | 'Pending' | 'Rejected';
+  createdBy?: string;
+  notes?: string;
 };
 
 export type Payment = {

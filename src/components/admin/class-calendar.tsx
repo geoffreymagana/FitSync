@@ -1,10 +1,9 @@
 
-
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
 import { add, format, parse, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isToday, isSameDay, set, getDay, addDays, eachWeekOfInterval, nextByDay, parseISO, isBefore, formatISO } from "date-fns";
-import { PlusCircle, Ban, Unlock, ChevronLeft, ChevronRight, Video } from "lucide-react";
+import { PlusCircle, Ban, Unlock, ChevronLeft, ChevronRight, Video, CalendarRange, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "../ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { ClassDetailsModal } from "./class-details-modal";
 
 const LOCAL_STORAGE_KEY = 'fitsync_all_classes';
 
@@ -39,6 +39,8 @@ interface ClassCalendarProps {
   trainers: Trainer[];
   role?: 'admin' | 'instructor';
   instructorName?: string;
+  currentDate: Date;
+  setCurrentDate: (date: Date) => void;
 }
 
 const generateTimeSlots = (date: Date) => {
@@ -154,6 +156,8 @@ const ClassForm = ({
             meetingUrl: formData.get('meetingUrl') as string,
             paymentType: paymentType as 'free' | 'paid',
             price: paymentType === 'paid' ? Number(formData.get("price")) : 0,
+            status: role === 'instructor' ? 'Pending' : 'Approved',
+            createdBy: role === 'instructor' ? instructorName : 'Admin',
         };
 
         if (classesForDay && classesForDay.length >= 5 && !classData) {
@@ -255,7 +259,7 @@ const ClassForm = ({
 
                     <div className="space-y-4 rounded-md border p-4">
                         <Label className="font-semibold">Payment</Label>
-                        <RadioGroup defaultValue={paymentType} onValueChange={(value) => setPaymentType(value)} className="flex gap-4">
+                        <RadioGroup name="paymentType" defaultValue={paymentType} onValueChange={(value) => setPaymentType(value as 'free' | 'paid')} className="flex gap-4">
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="free" id="r1" />
                                 <Label htmlFor="r1">Free</Label>
@@ -315,7 +319,7 @@ const ClassForm = ({
 };
 
 
-const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructorName }: ClassCalendarProps) => {
+const ClassCalendar = ({ locationId, trainers, role = 'admin', instructorName, currentDate, setCurrentDate }: ClassCalendarProps) => {
   const [isMounted, setIsMounted] = useState(false);
   const [allClasses, setAllClasses] = useState<Class[]>(initialClasses);
   
@@ -343,13 +347,13 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
     }
   }, [allClasses, isMounted]);
   
-  const [currentDate, setCurrentDate] = useState(new Date());
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>(initialBlockedDates);
   const [reason, setReason] = useState("");
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
   const { toast } = useToast();
+  const [modalClass, setModalClass] = useState<Class | null>(null);
   
   const classColors: { [key: string]: string } = useMemo(() => {
     const uniqueNames = [...new Set(allClasses.map(c => c.name))];
@@ -490,6 +494,20 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
     setBlockedDates(blockedDates.filter(bd => bd.date !== formattedDate));
   }
 
+  const handleUpdateClass = (updatedClass: Class) => {
+    setAllClasses(prev => prev.map(c => c.id === updatedClass.id ? updatedClass : c));
+    toast({ title: "Class Updated", description: `${updatedClass.name} has been successfully updated.`})
+  }
+
+  const handleApproveRejectClass = (classId: string, approve: boolean) => {
+    setAllClasses(prev => prev.map(c => c.id === classId ? { ...c, status: approve ? 'Approved' : 'Rejected' } : c));
+    const cls = allClasses.find(c => c.id === classId);
+    toast({
+        title: `Class ${approve ? 'Approved' : 'Rejected'}`,
+        description: `The class "${cls?.name}" has been ${approve ? 'approved' : 'rejected'}.`
+    });
+  }
+
   if (!isMounted) {
     return (
       <Card>
@@ -516,36 +534,37 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
           </div>
         )}
         {dayClasses.map((cls) => {
-          const href = role === 'instructor' 
-            ? `/instructor/schedule/${cls.id}`
-            : `/admin/schedule/${cls.id}`;
-          
+          const isOwner = role === 'admin' || (role === 'instructor' && cls.trainer === instructorName);
           const classElement = (
             <TooltipProvider key={cls.id} delayDuration={300}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href={href} onClick={(e) => e.stopPropagation()} className="block">
-                    <div className={cn("p-1 rounded-md text-xs text-black flex items-center gap-1", cls.color, role === 'instructor' && cls.trainer !== instructorName ? 'opacity-50 border border-dashed border-gray-500' : '')}>
+                  <div onClick={(e) => { e.stopPropagation(); setModalClass(cls); }} className="cursor-pointer">
+                    <div className={cn(
+                        "p-1 rounded-md text-xs text-black flex items-center gap-1", 
+                        cls.color, 
+                        !isOwner ? 'opacity-50 border border-dashed border-gray-500' : '',
+                        cls.status === 'Pending' ? 'ring-2 ring-offset-1 ring-yellow-500 ring-dashed' : ''
+                    )}>
                       {cls.isOnline && <Video className="w-3 h-3 flex-shrink-0" />}
                       <div className="truncate">
                         <p className="font-semibold truncate">{cls.name}</p>
                         <p className="truncate">{cls.time}</p>
-                        {role === 'instructor' && cls.trainer !== instructorName && <p className="truncate text-[10px]">({cls.trainer})</p>}
+                        <p className="truncate text-[10px] text-gray-600">By: {cls.createdBy}</p>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 </TooltipTrigger>
-                 {role === 'admin' && (
-                    <TooltipContent className="w-64 text-sm" side="top" align="center">
-                        <div className="space-y-2">
-                             <h4 className="font-bold">{cls.name}</h4>
-                             <p><strong>Trainer:</strong> {cls.trainer}</p>
-                             <p><strong>Time:</strong> {format(parse(cls.time, 'HH:mm', new Date()), 'p')} - {format(add(parse(cls.time, 'HH:mm', new Date()), { minutes: cls.duration }), 'p')}</p>
-                             <p><strong>Occupancy:</strong> {cls.booked} / {cls.spots}</p>
-                             {cls.isOnline && <p className="flex items-center gap-2"><Video className="w-4 h-4"/> Online Class</p>}
-                        </div>
-                    </TooltipContent>
-                 )}
+                <TooltipContent className="w-64 text-sm" side="top" align="center">
+                    <div className="space-y-2">
+                          <h4 className="font-bold">{cls.name}</h4>
+                          <p><strong>Trainer:</strong> {cls.trainer}</p>
+                          <p><strong>Time:</strong> {format(parse(cls.time, 'HH:mm', new Date()), 'p')} - {format(add(parse(cls.time, 'HH:mm', new Date()), { minutes: cls.duration }), 'p')}</p>
+                          <p><strong>Occupancy:</strong> {cls.booked} / {cls.spots}</p>
+                          {cls.status && <p className="font-semibold capitalize">Status: <span className={cn(cls.status === 'Pending' ? 'text-yellow-600' : cls.status === 'Approved' ? 'text-green-600' : 'text-red-600')}>{cls.status}</span></p>}
+                          {cls.isOnline && <p className="flex items-center gap-2"><Video className="w-4 h-4"/> Online Class</p>}
+                    </div>
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           );
@@ -570,7 +589,7 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
             </span>
             <CellContent />
             <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 flex items-center">
-              {!isBlocked && role === 'admin' && (
+              {!isBlocked && (role === 'admin' || role === 'instructor') && (
                   <TooltipProvider>
                       <Tooltip>
                           <TooltipTrigger asChild>
@@ -578,16 +597,18 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
                                   <PlusCircle className="h-4 w-4" />
                               </Button>
                           </TooltipTrigger>
-                          <TooltipContent><p>Add Class</p></TooltipContent>
+                          <TooltipContent><p>{role === 'instructor' ? 'Request New Class' : 'Add Class'}</p></TooltipContent>
                       </Tooltip>
-                      <Tooltip>
-                          <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openBlockDialog(day)}>
-                                  <Ban className="h-4 w-4" />
-                              </Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Block Day</p></TooltipContent>
-                      </Tooltip>
+                      {role === 'admin' && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openBlockDialog(day)}>
+                                    <Ban className="h-4 w-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent><p>Block Day</p></TooltipContent>
+                        </Tooltip>
+                      )}
                   </TooltipProvider>
               )}
               {isBlocked && role === 'admin' && (
@@ -633,9 +654,9 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogContent className="sm:max-w-2xl p-0">
               <DialogHeader className="p-6 pb-0">
-                  <DialogTitle>Add New Class</DialogTitle>
+                  <DialogTitle>{role === 'instructor' ? 'Request New Class' : 'Add New Class'}</DialogTitle>
                     <DialogDescription>
-                      Schedule a new class for {format(selectedDate, "PPP")}.
+                      Schedule a new class for {format(selectedDate, "PPP")}. {role === 'instructor' && 'This will be sent for admin approval.'}
                   </DialogDescription>
               </DialogHeader>
               <ClassForm 
@@ -668,8 +689,20 @@ const ScheduleGridCalendar = ({ locationId, trainers, role = 'admin', instructor
               </DialogFooter>
           </DialogContent>
       </Dialog>
+      {modalClass && (
+        <ClassDetailsModal
+            isOpen={!!modalClass}
+            onClose={() => setModalClass(null)}
+            classData={modalClass}
+            role={role}
+            onUpdateClass={handleUpdateClass}
+            trainers={trainers}
+            onApproveReject={handleApproveRejectClass}
+            isOwner={role === 'admin' || (role === 'instructor' && modalClass.trainer === instructorName)}
+        />
+      )}
     </Card>
   );
 }
 
-export { ScheduleGridCalendar as ClassCalendar };
+export { ClassCalendar };

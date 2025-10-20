@@ -5,10 +5,10 @@
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { classes as initialClasses, trainers, Class, Trainer } from "@/lib/data";
+import { classes as initialClasses, trainers, Class, Trainer, members } from "@/lib/data";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Edit, Trash, Save, Video, Link as LinkIcon, Wallet } from "lucide-react";
+import { ChevronLeft, Edit, Trash, Save, Video, Link as LinkIcon, Wallet, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const LOCAL_STORAGE_KEY = 'fitsync_all_classes';
 
@@ -52,7 +55,7 @@ const ClassForm = ({
             <div className="grid grid-cols-2 gap-6">
                 <div className="grid gap-3">
                     <div className="font-semibold">Occupancy</div>
-                    <Badge variant={classData.booked >= classData.spots ? 'destructive' : 'default'}>{classData.booked} / {classData.spots} booked</Badge>
+                     <span className={cn("text-sm", classData.booked >= classData.spots ? "text-destructive" : "text-muted-foreground")}>{classData.booked} / {classData.spots} booked</span>
                 </div>
                 <div className="grid gap-3">
                     <div className="font-semibold">Duration</div>
@@ -137,7 +140,7 @@ const ClassForm = ({
       </div>
        <div className="space-y-4 rounded-md border p-4">
             <Label className="font-semibold">Payment</Label>
-            <RadioGroup value={paymentType} onValueChange={(value) => setPaymentType(value)}>
+            <RadioGroup name="paymentType" value={paymentType} onValueChange={(value) => setPaymentType(value as 'free' | 'paid')}>
                 <div className="flex items-center space-x-2">
                     <RadioGroupItem value="free" id="r1" />
                     <Label htmlFor="r1">Free</Label>
@@ -163,6 +166,7 @@ export default function ClassDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const classId = params.id as string;
+  const { toast } = useToast();
   
   const [classes, setClasses] = useState<Class[]>(initialClasses);
   const [cls, setCls] = useState<Class | undefined>(undefined);
@@ -217,6 +221,10 @@ export default function ClassDetailsPage() {
     }
     setCls(updatedClassData); // Update the state for the current page
     setIsEditing(false);
+    toast({
+        title: "Class Updated",
+        description: `${updatedClassData.name} has been successfully updated.`
+    });
   };
 
   const handleDeleteClass = () => {
@@ -229,6 +237,9 @@ export default function ClassDetailsPage() {
     }
     router.push("/admin/schedule");
   }
+
+  // Mock booked members
+  const bookedMembers = members.slice(0, cls.booked);
 
   return (
     <div className="space-y-8">
@@ -243,43 +254,74 @@ export default function ClassDetailsPage() {
         </div>
       </PageHeader>
         
-      <Card>
-          <form onSubmit={handleEditClass}>
-              <CardHeader>
-              <CardTitle>Class Details</CardTitle>
-              <CardDescription>
-                  {isEditing ? "Edit the details of the class." : "A detailed view of the scheduled class."}
-              </CardDescription>
-              </CardHeader>
-              <CardContent>
-                  <ClassForm classData={cls} trainers={trainers} isEditing={isEditing} />
-              </CardContent>
-                <CardFooter className="flex justify-start gap-2 border-t pt-6">
-                  {isEditing ? (
-                      <>
-                          <Button type="submit">
-                              <Save className="mr-2 h-4 w-4" />
-                              Save Changes
-                          </Button>
-                          <Button variant="outline" type="button" onClick={() => setIsEditing(false)}>
-                              Cancel
-                          </Button>
-                      </>
-                  ) : (
-                        <>
-                          <Button type="button" onClick={() => setIsEditing(true)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit Class
-                          </Button>
-                          <Button type="button" variant="destructive" onClick={handleDeleteClass}>
-                              <Trash className="mr-2 h-4 w-4" />
-                              Delete Class
-                          </Button>
-                      </>
-                  )}
-              </CardFooter>
-          </form>
-      </Card>
+      <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+             <Card>
+                <form onSubmit={handleEditClass}>
+                    <CardHeader>
+                    <CardTitle>Class Details</CardTitle>
+                    <CardDescription>
+                        {isEditing ? "Edit the details of the class." : "A detailed view of the scheduled class."}
+                    </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ClassForm classData={cls} trainers={trainers} isEditing={isEditing} />
+                    </CardContent>
+                        <CardFooter className="flex justify-start gap-2 border-t pt-6">
+                        {isEditing ? (
+                            <>
+                                <Button type="submit">
+                                    <Save className="mr-2 h-4 w-4" />
+                                    Save Changes
+                                </Button>
+                                <Button variant="outline" type="button" onClick={() => setIsEditing(false)}>
+                                    Cancel
+                                </Button>
+                            </>
+                        ) : (
+                                <>
+                                <Button type="button" onClick={() => setIsEditing(true)}>
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Edit Class
+                                </Button>
+                                <Button type="button" variant="destructive" onClick={handleDeleteClass}>
+                                    <Trash className="mr-2 h-4 w-4" />
+                                    Delete Class
+                                </Button>
+                            </>
+                        )}
+                    </CardFooter>
+                </form>
+            </Card>
+          </div>
+           <div className="lg:col-span-1">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Users className="w-5 h-5"/> Booked Clients</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {bookedMembers.length > 0 ? (
+                            <div className="space-y-4">
+                                {bookedMembers.map(member => (
+                                    <div key={member.id} className="flex items-center gap-3">
+                                        <Avatar>
+                                            <AvatarImage src={member.avatarUrl} />
+                                            <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-medium text-sm">{member.name}</p>
+                                            <p className="text-xs text-muted-foreground">{member.email}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-muted-foreground text-sm text-center py-4">No clients have booked this class yet.</p>
+                        )}
+                    </CardContent>
+                </Card>
+           </div>
+      </div>
     </div>
   );
 }

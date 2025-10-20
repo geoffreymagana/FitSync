@@ -5,13 +5,16 @@
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { classes as initialClasses, trainers, Class } from "@/lib/data";
+import { classes as initialClasses, members } from "@/lib/data";
+import { Class } from "@/lib/types";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Video, Link as LinkIcon, Wallet } from "lucide-react";
+import { ChevronLeft, Video, Link as LinkIcon, Wallet, Users } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 
 const LOCAL_STORAGE_KEY = 'fitsync_all_classes';
 
@@ -41,6 +44,9 @@ export default function InstructorClassDetailsPage() {
   if (!cls) {
     return null; 
   }
+  
+  // Mock booked members
+  const bookedMembers = members.slice(0, cls.booked);
 
   return (
     <div className="space-y-8">
@@ -55,58 +61,89 @@ export default function InstructorClassDetailsPage() {
         </div>
       </PageHeader>
         
-      <Card>
-            <CardHeader>
-                <CardTitle>Class Details</CardTitle>
-                <CardDescription>A detailed view of the scheduled class.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="grid gap-6">
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="grid gap-3">
-                            <div className="font-semibold">Trainer</div>
-                            <div className="text-muted-foreground">{cls.trainer}</div>
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Class Details</CardTitle>
+                    <CardDescription>A detailed view of the scheduled class.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-6">
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="grid gap-3">
+                                <div className="font-semibold">Trainer</div>
+                                <div className="text-muted-foreground">{cls.trainer}</div>
+                            </div>
+                            <div className="grid gap-3">
+                                <div className="font-semibold">Date & Time</div>
+                                <div className="text-muted-foreground">{cls.date} at {cls.time}</div>
+                            </div>
                         </div>
-                        <div className="grid gap-3">
-                            <div className="font-semibold">Date & Time</div>
-                            <div className="text-muted-foreground">{cls.date} at {cls.time}</div>
-                        </div>
-                    </div>
-                    <Separator />
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="grid gap-3">
-                            <div className="font-semibold">Occupancy</div>
-                            <Badge variant={cls.booked >= cls.spots ? 'destructive' : 'default'}>{cls.booked} / {cls.spots} booked</Badge>
-                        </div>
-                        <div className="grid gap-3">
-                            <div className="font-semibold">Duration</div>
-                            <div className="text-muted-foreground">{cls.duration} minutes</div>
-                        </div>
-                    </div>
-                    {cls.isOnline && cls.meetingUrl && (
-                      <>
                         <Separator />
-                        <div className="grid gap-3">
-                          <div className="font-semibold flex items-center gap-2"><Video className="w-4 h-4"/> Online Class</div>
-                          <a href={cls.meetingUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline flex items-center gap-2">
-                            <LinkIcon className="w-4 h-4" />
-                            Join Meeting
-                          </a>
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="grid gap-3">
+                                <div className="font-semibold">Occupancy</div>
+                                <span className={cn("text-sm w-fit", cls.booked >= cls.spots ? "text-destructive" : "text-muted-foreground")}>{cls.booked} / {cls.spots} booked</span>
+                            </div>
+                            <div className="grid gap-3">
+                                <div className="font-semibold">Duration</div>
+                                <div className="text-muted-foreground">{cls.duration} minutes</div>
+                            </div>
                         </div>
-                      </>
-                    )}
-                    {cls.paymentType === 'paid' && (
+                        {cls.isOnline && cls.meetingUrl && (
                         <>
                             <Separator />
                             <div className="grid gap-3">
-                                <div className="font-semibold flex items-center gap-2"><Wallet className="w-4 h-4"/> Paid Class</div>
-                                <div className="text-muted-foreground font-bold text-lg">KES {cls.price?.toLocaleString()}</div>
+                            <div className="font-semibold flex items-center gap-2"><Video className="w-4 h-4"/> Online Class</div>
+                            <a href={cls.meetingUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline flex items-center gap-2">
+                                <LinkIcon className="w-4 h-4" />
+                                Join Meeting
+                            </a>
                             </div>
                         </>
-                    )}
-                </div>
-            </CardContent>
-      </Card>
+                        )}
+                        {cls.paymentType === 'paid' && (
+                            <>
+                                <Separator />
+                                <div className="grid gap-3">
+                                    <div className="font-semibold flex items-center gap-2"><Wallet className="w-4 h-4"/> Paid Class</div>
+                                    <div className="text-muted-foreground font-bold text-lg">KES {cls.price?.toLocaleString()}</div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+         <div className="lg:col-span-1">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Users className="w-5 h-5"/> Booked Clients</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {bookedMembers.length > 0 ? (
+                            <div className="space-y-4">
+                                {bookedMembers.map(member => (
+                                    <div key={member.id} className="flex items-center gap-3">
+                                        <Avatar>
+                                            <AvatarImage src={member.avatarUrl} />
+                                            <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-medium text-sm">{member.name}</p>
+                                            <p className="text-xs text-muted-foreground">{member.email}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-muted-foreground text-sm text-center py-4">No clients have booked this class yet.</p>
+                        )}
+                    </CardContent>
+                </Card>
+           </div>
+      </div>
     </div>
   );
 }

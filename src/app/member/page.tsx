@@ -1,8 +1,7 @@
 
-
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,15 +12,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { members } from "@/lib/data";
+import { members, classes as initialClasses, Class } from "@/lib/data";
+import { isFuture, parseISO } from "date-fns";
+
+const CLASSES_STORAGE_KEY = 'fitsync_all_classes';
 
 export default function MemberDashboardPage() {
     const { toast } = useToast();
     const [isWorkoutDialogOpen, setIsWorkoutDialogOpen] = useState(false);
     const [isMealDialogOpen, setIsMealDialogOpen] = useState(false);
+    const [allClasses, setAllClasses] = useState<Class[]>(initialClasses);
+
+    useEffect(() => {
+        const storedClasses = localStorage.getItem(CLASSES_STORAGE_KEY);
+        if (storedClasses) {
+            try {
+                setAllClasses(JSON.parse(storedClasses));
+            } catch (e) {
+                console.error("Failed to parse classes from local storage", e);
+            }
+        }
+    }, []);
 
     // In a real app, this would come from auth context
     const member = useMemo(() => members.find(m => m.id === 'M001'), []);
+
+    const upcomingClass = useMemo(() => {
+        return allClasses
+            .filter(cls => cls.status === 'Approved' && isFuture(parseISO(`${cls.date}T${cls.time}`)))
+            .sort((a,b) => new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime())[0];
+    }, [allClasses]);
 
     const handleLogSubmit = (type: 'Workout' | 'Meal') => {
         if (type === 'Workout') {
@@ -42,13 +62,20 @@ export default function MemberDashboardPage() {
             
             <Card>
                 <CardHeader>
-                    <CardTitle>Today's Focus</CardTitle>
+                    <CardTitle>Next Up</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="p-4 bg-accent/50 rounded-lg">
-                        <h4 className="font-semibold">HIIT Blast at 9:00 AM</h4>
-                        <p className="text-sm text-muted-foreground">with Juma Kalama</p>
-                    </div>
+                    {upcomingClass ? (
+                         <div className="p-4 bg-accent/50 rounded-lg">
+                            <h4 className="font-semibold">{upcomingClass.name} at {upcomingClass.time}</h4>
+                            <p className="text-sm text-muted-foreground">with {upcomingClass.trainer}</p>
+                        </div>
+                    ) : (
+                         <div className="p-4 bg-accent/50 rounded-lg text-center">
+                            <h4 className="font-semibold">No upcoming classes</h4>
+                            <p className="text-sm text-muted-foreground">Check the classes tab to book your next session.</p>
+                        </div>
+                    )}
                     <Button className="w-full" asChild>
                         <Link href="/member/classes">
                             <Calendar className="mr-2 h-4 w-4" />

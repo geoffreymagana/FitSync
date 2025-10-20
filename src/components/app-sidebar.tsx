@@ -51,7 +51,7 @@ const adminNavGroups: NavGroup[] = [
             { href: "/admin/trainers", icon: Dumbbell, label: "Trainers" },
             { href: "/admin/staff", icon: Briefcase, label: "Staff" },
             { href: "/admin/schedule", icon: Calendar, label: "Schedule" },
-            { href: "/admin/accounts", icon: UserCog, label: "Accounts" },
+            { href: "/admin/approvals", icon: UserCog, label: "Approvals" },
         ],
     },
     {

@@ -1,4 +1,5 @@
 
+
 import { Member, Trainer, Class, Payment, Activity, Location, Plan, Staff, Notification, WalkInService, InventoryItem, TrainerSpecialization, BlockedDate, FinancialBreakdown, CheckInHistory, Discount, Subscription } from './types';
 
 export const locations: Location[] = [
@@ -70,24 +71,27 @@ export const staff: Staff[] = [
 ];
 
 export const upcomingClasses: Omit<Class, 'date' | 'duration' | 'locationId'>[] = [
-    { id: 'C101', name: 'Morning Yoga', trainer: 'Wambui Kimani', time: '8:00 AM', spots: 20, booked: 15 },
-    { id: 'C102', name: 'HIIT Blast', trainer: 'Juma Kalama', time: '9:00 AM', spots: 25, booked: 25 },
-    { id: 'C103', name: 'Powerlifting 101', trainer: 'Baraka Mwangi', time: '10:30 AM', spots: 15, booked: 10 },
-    { id: 'C104', name: 'Evening Pilates', trainer: 'Wambui Kimani', time: '6:00 PM', spots: 20, booked: 18 },
+    { id: 'C101', name: 'Morning Yoga', trainer: 'Wambui Kimani', time: '8:00 AM', spots: 20, booked: 15, status: 'Approved' },
+    { id: 'C102', name: 'HIIT Blast', trainer: 'Juma Kalama', time: '9:00 AM', spots: 25, booked: 25, status: 'Approved' },
+    { id: 'C103', name: 'Powerlifting 101', trainer: 'Baraka Mwangi', time: '10:30 AM', spots: 15, booked: 10, status: 'Approved' },
+    { id: 'C104', name: 'Evening Pilates', trainer: 'Wambui Kimani', time: '6:00 PM', spots: 20, booked: 18, status: 'Approved' },
 ];
 
 export let classes: Class[] = [
   // Meru
-  { id: 'C102', locationId: 'L01', name: 'HIIT Blast', trainer: 'Juma Kalama', date: '2023-05-25', time: '09:00', duration: 45, spots: 25, booked: 25 },
-  { id: 'C201', locationId: 'L01', name: 'Zumba Party', trainer: 'Achieng Otieno', date: '2023-05-26', time: '17:00', duration: 50, spots: 30, booked: 28 },
+  { id: 'C102', locationId: 'L01', name: 'HIIT Blast', trainer: 'Juma Kalama', date: '2023-05-25', time: '09:00', duration: 45, spots: 25, booked: 25, status: 'Approved', createdBy: 'Admin' },
+  { id: 'C201', locationId: 'L01', name: 'Zumba Party', trainer: 'Achieng Otieno', date: '2023-05-26', time: '17:00', duration: 50, spots: 30, booked: 28, status: 'Approved', createdBy: 'Admin' },
+  { id: 'C203', locationId: 'L01', name: 'Beginner CrossFit', trainer: 'Juma Kalama', date: '2024-07-28', time: '11:00', duration: 60, spots: 15, booked: 0, status: 'Pending', createdBy: 'Juma Kalama' },
+
 
   // Nairobi
-  { id: 'C101', locationId: 'L02', name: 'Morning Yoga', trainer: 'Wambui Kimani', date: '2023-05-25', time: '08:00', duration: 60, spots: 20, booked: 15 },
-  { id: 'C104', locationId: 'L02', name: 'Evening Pilates', trainer: 'Wambui Kimani', date: '2023-05-25', time: '18:00', duration: 60, spots: 20, booked: 18 },
+  { id: 'C101', locationId: 'L02', name: 'Morning Yoga', trainer: 'Wambui Kimani', date: '2023-05-25', time: '08:00', duration: 60, spots: 20, booked: 15, status: 'Approved', createdBy: 'Admin' },
+  { id: 'C104', locationId: 'L02', name: 'Evening Pilates', trainer: 'Wambui Kimani', date: '2023-05-25', time: '18:00', duration: 60, spots: 20, booked: 18, status: 'Approved', createdBy: 'Admin' },
+  { id: 'C204', locationId: 'L02', name: 'Advanced Vinyasa', trainer: 'Wambui Kimani', date: '2024-07-29', time: '08:00', duration: 75, spots: 15, booked: 0, status: 'Pending', createdBy: 'Wambui Kimani' },
 
   // Mombasa
-  { id: 'C103', locationId: 'L03', name: 'Powerlifting 101', trainer: 'Baraka Mwangi', date: '2023-05-25', time: '10:30', duration: 90, spots: 15, booked: 10 },
-  { id: 'C202', locationId: 'L03', name: 'Spin Cycle', trainer: 'Abdi Yusuf', date: '2023-05-26', time: '18:00', duration: 45, spots: 20, booked: 12 },
+  { id: 'C103', locationId: 'L03', name: 'Powerlifting 101', trainer: 'Baraka Mwangi', date: '2023-05-25', time: '10:30', duration: 90, spots: 15, booked: 10, status: 'Approved', createdBy: 'Admin' },
+  { id: 'C202', locationId: 'L03', name: 'Spin Cycle', trainer: 'Abdi Yusuf', date: '2023-05-26', time: '18:00', duration: 45, spots: 20, booked: 12, status: 'Approved', createdBy: 'Admin' },
 ];
 
 export const blockedDates: BlockedDate[] = [

@@ -5,19 +5,48 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Users } from "lucide-react";
-import { classes, members, trainers } from "@/lib/data";
-import { useMemo } from "react";
+import { classes as initialClasses, members, trainers } from "@/lib/data";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
+import { Class } from "@/lib/types";
+import { isToday, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
+
+const CLASSES_STORAGE_KEY = 'fitsync_all_classes';
 
 export default function InstructorDashboardPage() {
+    const [allClasses, setAllClasses] = useState<Class[]>(initialClasses);
     const instructorName = "Juma Kalama"; // Example instructor
     const instructor = useMemo(() => trainers.find(t => t.name === instructorName), [instructorName]);
 
+     useEffect(() => {
+        const storedClasses = localStorage.getItem(CLASSES_STORAGE_KEY);
+        if (storedClasses) {
+            try {
+                setAllClasses(JSON.parse(storedClasses));
+            } catch (e) {
+                console.error("Failed to parse classes from local storage", e);
+            }
+        }
+    }, []);
+
+    const classColors: { [key: string]: string } = useMemo(() => {
+        const uniqueNames = [...new Set(allClasses.map(c => c.name))];
+        const colors = ["border-blue-500", "border-green-500", "border-yellow-500", "border-purple-500", "border-pink-500", "border-indigo-500", "border-red-500"];
+        return uniqueNames.reduce((acc, name, index) => {
+            acc[name] = colors[index % colors.length];
+            return acc;
+        }, {} as { [key: string]: string });
+    }, [allClasses]);
+
     const todaysClasses = useMemo(() => {
-        const today = "2023-05-25"; // Mocking today's date for demo
         if (!instructor) return [];
-        return classes.filter(c => c.trainer === instructor.name && c.date === today);
-    }, [instructor]);
+        return allClasses.filter(c => 
+            c.trainer === instructor.name && 
+            c.status === 'Approved' &&
+            isToday(parseISO(c.date))
+        ).sort((a, b) => a.time.localeCompare(b.time));
+    }, [instructor, allClasses]);
     
     const clientCount = useMemo(() => {
         // Mocking client assignment for demo
@@ -61,10 +90,10 @@ export default function InstructorDashboardPage() {
                 </CardHeader>
                 <CardContent>
                     {todaysClasses.length > 0 ? (
-                        <div className="space-y-4">
+                        <div className="flex flex-col gap-2">
                             {todaysClasses.map(cls => (
-                                <Link key={cls.id} href={`/instructor/schedule`}>
-                                <div  className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted">
+                                <Link key={cls.id} href={`/instructor/schedule/${cls.id}`}>
+                                <div  className={cn("flex items-center justify-between p-3 rounded-lg hover:bg-muted border-l-4", classColors[cls.name] || 'border-gray-500')}>
                                     <div>
                                         <p className="font-semibold">{cls.name}</p>
                                         <p className="text-sm text-muted-foreground">{cls.time}</p>
@@ -77,7 +106,7 @@ export default function InstructorDashboardPage() {
                             ))}
                         </div>
                     ) : (
-                        <p className="text-muted-foreground">You have no classes scheduled for today.</p>
+                        <p className="text-muted-foreground text-center py-4">You have no classes scheduled for today.</p>
                     )}
                 </CardContent>
             </Card>
