@@ -78,7 +78,7 @@ A dedicated space for trainers to manage their classes and clients.
 -   **Dashboard:** An overview of the instructor's daily schedule and total assigned clients.
 -   **Schedule Management:** A personal calendar showing only the classes assigned to that instructor.
 -   **Client Management:** A list of assigned members, with access to their profiles to create and send custom workout/meal plans and view progress.
--   **Messaging:** A dedicated interface to communicate with clients.
+-   **Messaging:** A dedicated interface to communicate with clients on progress.
 
 ### 5. Core System Modules
 -   **Authentication:** Handles secure login for different user roles (Admin, Member, Instructor, Reception).
