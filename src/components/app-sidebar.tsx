@@ -14,7 +14,7 @@ import {
   Award,
   Briefcase,
   UserRound,
-  Megaphone,
+  Workflow,
   Percent,
   Warehouse,
   ShoppingBag,
@@ -75,7 +75,7 @@ const adminNavGroups: NavGroup[] = [
         title: "Business",
         items: [
             { href: "/admin/analytics", icon: PieChart, label: "Analytics" },
-            { href: "/admin/marketing", icon: Megaphone, label: "Marketing" },
+            { href: "/admin/marketing", icon: Workflow, label: "Integrations" },
             { href: "/admin/locations", icon: MapPin, label: "Locations" },
         ]
      }
@@ -133,7 +133,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
 
   const defaultAccordionValue = useMemo(() => {
     if (role !== 'admin') return "";
-    const activeGroup = adminNavGroups.find(group => 
+    const activeGroup = adminNavGroups.find(group =>
       group.items.some(item => pathname.startsWith(item.href))
     );
     return activeGroup?.title || "";
@@ -182,8 +182,8 @@ export function AppSidebar({ role }: AppSidebarProps) {
   const renderSimpleNav = (items: NavItem[]) => (
      <ul className="flex w-full min-w-0 flex-col gap-1 px-3">
           {items.map((item) => {
-            const isActive = item.href === baseHref 
-              ? pathname === item.href 
+            const isActive = item.href === baseHref
+              ? pathname === item.href
               : pathname.startsWith(item.href);
             return (
               <li key={item.href} className="group/menu-item relative">

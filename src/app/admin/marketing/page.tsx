@@ -5,14 +5,14 @@ import { useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { marketingIntegrations } from "@/lib/integrations";
+import { Integrations } from "@/lib/integrations";
 import { Integration } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { CheckCircle, Zap } from "lucide-react";
+import { CheckCircle, Workflow } from "lucide-react";
 
 export default function MarketingPage() {
-    const [integrations, setIntegrations] = useState<Integration[]>(marketingIntegrations);
+    const [integrations, setIntegrations] = useState<Integration[]>(Integrations);
     const { toast } = useToast();
 
     const handleConnect = (integrationId: string) => {
@@ -63,7 +63,7 @@ export default function MarketingPage() {
                                         </Button>
                                     ) : (
                                         <Button className="w-full" onClick={() => handleConnect(integration.id)}>
-                                            <Zap className="mr-2 h-4 w-4" />
+                                            <Workflow className="mr-2 h-4 w-4" />
                                             Connect
                                         </Button>
                                     )}

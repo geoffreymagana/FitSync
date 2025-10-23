@@ -1,6 +1,6 @@
 import { Integration } from './types';
 
-export const marketingIntegrations: Integration[] = [
+export const Integrations: Integration[] = [
   {
     id: 'hubspot',
     name: 'HubSpot',
